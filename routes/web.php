@@ -17,3 +17,5 @@ Route::get('/', [\App\Http\Controllers\Controller::class, 'getFoodEntries'])->na
 Route::get('/food-items', [\App\Http\Controllers\Controller::class, 'getFoodItems'])->name('food-items.index');
 Route::post('/food-items', [\App\Http\Controllers\Controller::class, 'addFoodItem'])->name('food-items.store');
 Route::delete('/food-items/{id}', [\App\Http\Controllers\Controller::class, 'deleteFoodItem'])->name('food-items.destroy');
+Route::post('/food-entries', [\App\Http\Controllers\Controller::class, 'addFoodEntry'])->name('food-entries.store');
+Route::delete('/food-entries/{id}', [\App\Http\Controllers\Controller::class, 'deleteFoodEntry'])->name('food-entries.destroy');

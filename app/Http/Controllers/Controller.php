@@ -21,22 +21,32 @@ class Controller extends BaseController
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
-    public function addFoodEntry($request)
+    public function addFoodEntry(Request $request)
     {
         // Validate the request data
         $validatedData = $request->validate([
             'food_item_id' => 'required|exists:food_items,id',
             'multiplier' => 'required|numeric|min:0',
-            'datetime' => 'required|date',
+            'date' => 'required|date_format:Y-m-d',
+            'time' => 'required|date_format:H:i',
+            'description' => 'nullable|string|max:255',
         ]);
 
         // Create a new food entry
+        $validatedData['ate_at'] = Carbon::createFromFormat(
+            'Y-m-d H:i',
+            $validatedData['date'] . ' ' . $validatedData['time']
+        );
         $foodEntry = new \App\Models\FoodEntry($validatedData);
 
         // Save the food entry to the database
         $foodEntry->save();
 
-        return response()->json(['message' => 'Food entry added successfully', 'entry' => $foodEntry], 201);
+        # TODO: redirect to the specific day, if another day is selected
+        return redirect()->route('food-entries.index')->with(
+            'success',
+            'Adăugat cu succes intrarea alimentară: ' . $foodEntry->foodItem->name
+        )->withPreviousInput($request->all());
     }
 
     public function getFoodEntries(FoodEntryService $foodEntryService, DayStatsService $dayStatsService)
@@ -69,6 +79,7 @@ class Controller extends BaseController
             $sumProtein = $entries->sum('protein');
 
             $allWeekDates->push([
+                'datestring' => (clone $currentDate)->format('Y-m-d'),
                 'date' => $currentDate->format('j') . ' ' . $namesOfMonths[$currentDate->month - 1],
                 'dayNameHuman' => $namesOfDays[($currentDate->dayOfWeek + 6) % 7],
                 'today' => $namesOfDays[(now()->dayOfWeek + 6) % 7],
@@ -85,6 +96,9 @@ class Controller extends BaseController
             'foodEntries' => $allWeekDates,
             'startDate' => $startDate,
             'endDate' => $endDate,
+            # TODO: selectize
+            'foodItems' => \App\Models\FoodItem::orderBy('name')->get(),
+            'todayDatestring' => now()->format('Y-m-d'),
         ]);
     }
 
@@ -95,7 +109,7 @@ class Controller extends BaseController
             ->orderBy('name')
             ->get();
 
-        $foodItems = $foodEntryService->getQtyForHumans(
+        $foodItems = $foodEntryService->addQtyForHumans(
             $foodItems,
             "unit_name",
             "unit_base_quantity"
@@ -149,6 +163,20 @@ class Controller extends BaseController
         return redirect()->route('food-items.index')->with(
             'success',
             'Alimentul a fost șters cu succes.'
+        );
+    }
+
+    public function deleteFoodEntry($id)
+    {
+        // Find the food entry by ID
+        $foodEntry = \App\Models\FoodEntry::findOrFail($id);
+
+        // Delete the food entry
+        $foodEntry->delete();
+
+        return redirect()->route('food-entries.index')->with(
+            'success',
+            'Intrarea alimentară a fost ștearsă cu succes.'
         );
     }
 }

@@ -13,6 +13,7 @@ class FoodEntry extends Model
         'food_item_id',
         'multiplier',
         'ate_at',
+        'description',
     ];
 
     public function foodItem()
