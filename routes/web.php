@@ -14,3 +14,5 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [\App\Http\Controllers\Controller::class, 'getFoodEntries'])->name('food-entries.index');
+Route::get('/food-items', [\App\Http\Controllers\Controller::class, 'getFoodItems'])->name('food-items.index');
+Route::post('/food-items', [\App\Http\Controllers\Controller::class, 'addFoodItem'])->name('food-items.store');

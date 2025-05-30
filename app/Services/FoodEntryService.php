@@ -40,4 +40,25 @@ class FoodEntryService
         // Format the results
         return $foodEntries->groupBy('ate_at_date');
     }
+
+    public function getQtyForHumans($entries, $unit_name, $unit_quantity)
+    {
+        $entries = $entries->map(function ($entry) use ($unit_name, $unit_quantity) {
+            # TODO: more implementations
+            switch ($entry->{$unit_name}) {
+                case 'g':
+                    $entry->qtyForHumans = $entry->{$unit_quantity} . 'g';
+                    break;
+                case 'buc':
+                    $entry->qtyForHumans = (int)$entry->{$unit_quantity} . ' buc';
+                    break;
+                default:
+                    $entry->qtyForHumans = $entry->{$unit_quantity} . ' ' . $entry->unit_name;
+            }
+
+            return $entry;
+        });
+
+        return $entries;
+    }
 }
