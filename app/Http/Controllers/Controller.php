@@ -91,7 +91,10 @@ class Controller extends BaseController
     public function getFoodItems(FoodEntryService $foodEntryService)
     {
         // Retrieve all food items
-        $foodItems = \App\Models\FoodItem::all();
+        $foodItems = \App\Models\FoodItem::withCount('entries')
+            ->orderBy('name')
+            ->get();
+
         $foodItems = $foodEntryService->getQtyForHumans(
             $foodItems,
             "unit_name",
@@ -123,7 +126,29 @@ class Controller extends BaseController
         $foodItem->save();
 
         return redirect()->route('food-items.index')->with(
-            'success', 'Adăugat cu succes alimentul: ' . $foodItem->name
+            'success',
+            'Adăugat cu succes alimentul: ' . $foodItem->name
         )->withPreviousInput($request->all());
+    }
+
+    public function deleteFoodItem($id)
+    {
+        // Find the food item by ID
+        $foodItem = \App\Models\FoodItem::findOrFail($id);
+
+        if ($foodItem->entries()->count() > 0) {
+            return redirect()->route('food-items.index')->with(
+                'error',
+                'Nu se poate șterge alimentul deoarece are intrări asociate.'
+            );
+        }
+
+        // Delete the food item
+        $foodItem->delete();
+
+        return redirect()->route('food-items.index')->with(
+            'success',
+            'Alimentul a fost șters cu succes.'
+        );
     }
 }

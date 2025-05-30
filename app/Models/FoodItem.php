@@ -20,6 +20,6 @@ class FoodItem extends Model
 
     public function entries()
     {
-        return $this->hasMany(FoodItemEntry::class);
+        return $this->hasMany(FoodEntry::class);
     }
 }
