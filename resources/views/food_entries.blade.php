@@ -18,9 +18,9 @@
                 $day = $value['dayNameHuman'];
             @endphp
             <li class="nav-item">
-                <a class="nav-link {{ $day == $value['today'] ? 'active show' : '' }}" id="{{ strtolower($day) }}-tab" data-toggle="tab" href="#{{ strtolower($day) }}" role="tab" aria-controls="{{ strtolower($day) }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}" data-datestring="{{ $value['datestring'] }}">
+                <a class="nav-link {{ $day == $selectedDayName ? 'active show' : '' }}" id="{{ strtolower($day) }}-tab" data-toggle="tab" href="#{{ strtolower($day) }}" role="tab" aria-controls="{{ strtolower($day) }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}" data-datestring="{{ $value['date']->format('Y-m-d') }}">
                     <span class="span1">{{ $day }}</span><br/>
-                    <span class="small"> {{ $value['date'] }}</span>
+                    <span class="small"> {{ $value['date']->format('j F') }}</span>
                     </a>
             </li>
         @endforeach
@@ -30,7 +30,7 @@
         @php
             $day = $value['dayNameHuman'];
         @endphp
-        <div class="tab-pane fade {{ $day == $value['today'] ? 'active show' : '' }}" id="{{ strtolower($day) }}" role="tabpanel" aria-labelledby="{{ strtolower($day) }}-tab">
+        <div class="tab-pane fade {{ $day == $selectedDayName ? 'active show' : '' }}" id="{{ strtolower($day) }}" role="tabpanel" aria-labelledby="{{ strtolower($day) }}-tab">
             <div class="table-responsive">
                 <table class="table table-striped">
                     <thead>
@@ -49,7 +49,7 @@
                             <th scope="row">
                                 <div class="event-date">
                                     <span class="colorspan">
-                                        {{ $entry->ate_at_hour }}:{{$entry->ate_at_min ?: '00' }}
+                                        {{ $entry->ate_at->format("H:i")}}
                                     </span>
                                 </div>
                             </th>
@@ -156,10 +156,11 @@
 
     <div class="entryForm" style="margin-top: 20px; padding: 20px;">
                     <div style="margin-bottom: 20px;">
-                <h3>Adaugă </h3> <span class="badge badge-secondary dt-badge">pentru {{ $todayDatestring }}</span>
+                <h3>Adaugă </h3>
+                    <span class="badge badge-secondary dt-badge"> pentru {{ $selectedDay->format('Y-m-d' )}}</span>
                     </div>
         @csrf
-        <input type="hidden" name="date" value="{{ $todayDatestring }}">
+        <input type="hidden" name="date" value="{{ now()->format('Y-m-d') }}">
 
         <div class="form-row entryFormRow">
             <div class="col">
@@ -180,7 +181,7 @@
         </div>
         <div class="form-row entryFormRow">
             <div class="col-md-6 pull-left">
-                <input type="number" placeholder="fracție" class="form-control @if ($errors->has('multiplier')) is-invalid @endif " name="multiplier" value="{{ old('multiplier') }}" required>
+                <input type="number" step="0.1" placeholder="fracție" class="form-control @if ($errors->has('multiplier')) is-invalid @endif " name="multiplier" value="{{ old('multiplier') }}" required>
             </div>
             <div class="col">
                 <span class="the-unit" style="font-size:22px; vertical-align:middle; padding-left:10px"> x </span>

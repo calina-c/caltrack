@@ -15,6 +15,70 @@ class Controller extends BaseController
     use AuthorizesRequests;
     use ValidatesRequests;
 
+    public function getFoodEntries(FoodEntryService $foodEntryService, DayStatsService $dayStatsService)
+    {
+        // Retrieve all food entries
+        $selectedDate = request()->query('date') ? Carbon::createFromFormat("Y-m-d", request()->query('date')) : now();
+
+        $startDate = (clone $selectedDate)->startOfWeek(1);
+        $endDate = (clone $startDate)->endOfWeek();
+
+        $foodEntries = $foodEntryService->getGroupedFoodEntries($startDate, $endDate);
+
+        $namesOfDays = [
+            'Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă', 'Duminică'
+        ];
+
+        $allWeekDates = collect();
+        $currentDate = $startDate->copy();
+
+        while ($currentDate->lte($endDate)) {
+            $entries = $foodEntries->get($currentDate->format('Y-m-d'), collect());
+            $sumKcal = $entries->sum('kcal');
+            $sumProtein = $entries->sum('protein');
+
+            $allWeekDates->push([
+                'entries' => $entries,
+                'sumKcal' => $sumKcal,
+                'sumProtein' => $sumProtein,
+                'kcalClass' => $dayStatsService->getKcalRangeLabel($sumKcal),
+                'proteinClass' => $dayStatsService->getProteinRangeLabel($sumProtein),
+                'date' => (clone $currentDate),
+                'dayNameHuman' => $namesOfDays[($currentDate->dayOfWeek + 6) % 7],
+            ]);
+            $currentDate->addDay();
+        }
+
+        return view('food_entries', [
+            'foodEntries' => $allWeekDates,
+            # TODO: selectize
+            # for selector to create new food entries
+            'foodItems' => \App\Models\FoodItem::orderBy('name')->get(),
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'selectedDay' => $selectedDate,
+            'selectedDayName' => $namesOfDays[($selectedDate->dayOfWeek + 6) % 7],
+        ]);
+    }
+
+    public function getFoodItems(FoodEntryService $foodEntryService)
+    {
+        // Retrieve all food items
+        $foodItems = \App\Models\FoodItem::withCount('entries')
+            ->orderBy('name')
+            ->get();
+
+        $foodItems = $foodEntryService->addQtyForHumans(
+            $foodItems,
+            "unit_name",
+            "unit_base_quantity"
+        );
+
+        return view('food_items', [
+            'foodItems' => $foodItems,
+        ]);
+    }
+
     /**
      * Handle the incoming request.
      *
@@ -42,83 +106,15 @@ class Controller extends BaseController
         // Save the food entry to the database
         $foodEntry->save();
 
-        # TODO: redirect to the specific day, if another day is selected
-        return redirect()->route('food-entries.index')->with(
+        return redirect()->route(
+            'food-entries.index',
+            ['date' => $foodEntry->ate_at->format('Y-m-d')]
+        )->with(
             'success',
             'Adăugat cu succes intrarea alimentară: ' . $foodEntry->foodItem->name
         )->withPreviousInput($request->all());
     }
 
-    public function getFoodEntries(FoodEntryService $foodEntryService, DayStatsService $dayStatsService)
-    {
-        // Retrieve all food entries
-        $startDate = request()->query('date') ?
-            Carbon::createFromFormat("Y-m-d", request()->query('date'))->startOfWeek(1) :
-        now()->startOfWeek(1);
-
-        $endDate = clone $startDate;
-        $endDate->endOfWeek();
-
-        $foodEntries = $foodEntryService->getGroupedFoodEntries($startDate, $endDate);
-
-        $namesOfDays = [
-            'Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă', 'Duminică'
-        ];
-
-        $namesOfMonths = [
-            'Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie',
-            'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'
-        ];
-
-        $allWeekDates = collect();
-        $currentDate = $startDate->copy();
-
-        while ($currentDate->lte($endDate)) {
-            $entries = $foodEntries->get($currentDate->format('Y-m-d'), collect());
-            $sumKcal = $entries->sum('kcal');
-            $sumProtein = $entries->sum('protein');
-
-            $allWeekDates->push([
-                'datestring' => (clone $currentDate)->format('Y-m-d'),
-                'date' => $currentDate->format('j') . ' ' . $namesOfMonths[$currentDate->month - 1],
-                'dayNameHuman' => $namesOfDays[($currentDate->dayOfWeek + 6) % 7],
-                'today' => $namesOfDays[(now()->dayOfWeek + 6) % 7],
-                'entries' => $entries,
-                'sumKcal' => $sumKcal,
-                'sumProtein' => $sumProtein,
-                'kcalClass' => $dayStatsService->getKcalRangeLabel($sumKcal),
-                'proteinClass' => $dayStatsService->getProteinRangeLabel($sumProtein),
-            ]);
-            $currentDate->addDay();
-        }
-
-        return view('food_entries', [
-            'foodEntries' => $allWeekDates,
-            'startDate' => $startDate,
-            'endDate' => $endDate,
-            # TODO: selectize
-            'foodItems' => \App\Models\FoodItem::orderBy('name')->get(),
-            'todayDatestring' => now()->format('Y-m-d'),
-        ]);
-    }
-
-    public function getFoodItems(FoodEntryService $foodEntryService)
-    {
-        // Retrieve all food items
-        $foodItems = \App\Models\FoodItem::withCount('entries')
-            ->orderBy('name')
-            ->get();
-
-        $foodItems = $foodEntryService->addQtyForHumans(
-            $foodItems,
-            "unit_name",
-            "unit_base_quantity"
-        );
-
-        return view('food_items', [
-            'foodItems' => $foodItems,
-        ]);
-    }
 
 
     public function addFoodItem(Request $request)
