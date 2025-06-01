@@ -89,11 +89,14 @@ class Controller extends BaseController
     {
         // Validate the request data
         $validatedData = $request->validate([
-            'food_item_id' => 'required|exists:food_items,id',
-            'multiplier' => 'required|numeric|min:0',
+            'food_item_id' => 'sometimes',
+            'multiplier' => 'required_unless:food_item_id,null|numeric|min:0',
             'date' => 'required|date_format:Y-m-d',
             'time' => 'required|date_format:H:i',
             'description' => 'nullable|string|max:255',
+            'direct_kcal' => 'required_if:food_item_id,null',
+            'direct_protein' => 'required_if:food_item_id,null',
+            'direct_name' => 'required_if:food_item_id,null'
         ]);
 
         // Create a new food entry
@@ -111,7 +114,7 @@ class Controller extends BaseController
             ['date' => $foodEntry->ate_at->format('Y-m-d')]
         )->with(
             'success',
-            'Adăugat cu succes intrarea alimentară: ' . $foodEntry->foodItem->name
+            'Adăugat cu succes intrarea alimentară: ' . $foodEntry->direct_name ?: $foodEntry->foodItem->name
         )->withPreviousInput($request->all());
     }
 

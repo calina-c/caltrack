@@ -62,7 +62,7 @@
                             </td>
                             <td>
                                 <div class="r-no">
-                                    <h3>{{ $entry->food_name }}</h3>
+                                    <div class="largeish">{{ $entry->food_name }}</div>
                                     <div class="meta">
                                         {{ $entry->description }}
                                     </div>
@@ -167,12 +167,14 @@
                 <input type="time" class="form-control @if ($errors->has('time')) is-invalid @endif" name="time" value="{{ old('time') }}" required placeholder="Ora">
             </div>
         </div>
+        <span> <strong>DIN CATALOG:</strong></span>
+        <div style="padding: 20px; border: 1px solid #ccc; margin-bottom: 20px;">
         <div class="form-row entryFormRow">
             <div class="col">
-                <select class="form-control @if ($errors->has('food_item_id')) is-invalid @endif" name="food_item_id" required>
-                    <option value="" data-unit-name="">Selectează un aliment</option>
+                <select class="form-control @if ($errors->has('food_item_id')) is-invalid @endif" name="food_item_id">
+                    <option value="" data-unit-name="" data-unit-base-qty="">Selectează un aliment</option>
                     @foreach($foodItems as $foodItem)
-                        <option value="{{ $foodItem->id }}" {{ old('food_item_id') == $foodItem->id ? 'selected' : '' }} data-unit-name="{{ $foodItem->unit_name }}">
+                        <option value="{{ $foodItem->id }}" {{ old('food_item_id') == $foodItem->id ? 'selected' : '' }} data-unit-name="{{ $foodItem->unit_name }}" data-unit-base-qty="{{ $foodItem->unit_base_quantity }}">
                             {{ $foodItem->name }} @if ($foodItem->brand) ({{ $foodItem->brand }}) @endif
                         </option>
                     @endforeach
@@ -186,15 +188,26 @@
             <div class="col">
                 <span class="the-unit" style="font-size:22px; vertical-align:middle; padding-left:10px"> x </span>
             </div>
-
         </div>
+        </div>
+
+        <span> <strong>SAU DIRECT:</strong></span>
+        <div style="padding: 20px; border: 1px solid #ccc; margin-bottom: 20px;">
+        <div class="form-row">
+            <div class="col-md-12 entryFormRow">
+                <input type="text" class="form-control @if ($errors->has('direct_name')) is-invalid @endif" placeholder="Nume aliment" name="direct_name" value="{{ old('direct_name') }}" required>
+            </div>
+            <div class="col-md-6 entryFormRow">
+                <input type="number" step="1" placeholder="calorii" class="form-control @if ($errors->has('direct_kcal')) is-invalid @endif" name="direct_kcal" value="{{ old('direct_kcal') }}" required>
+            </div>
+            <div class="col-md-6 entryFormRow">
+                <input type="number" step="0.01" placeholder="proteine" class="form-control @if ($errors->has('direct_protein')) is-invalid @endif" name="direct_protein" value="{{ old('direct_protein') }}" required>
+            </div>
+        </div>
+
         <div class="form-row entryFormRow">
             <div class="col-md-12">
                 <input type="text" class="form-control @if ($errors->has('description')) is-invalid @endif" placeholder="Descriere" name="description" value="{{ old('description') }}">
-            </div>
-        </div>
-        <div class="form-row entryFormRow">
-            <div class="col-md-12">
             </div>
         </div>
     </div>
@@ -207,6 +220,7 @@
     </div>
   </div>
     </form>
+</div>
 </div>
 
 
@@ -239,11 +253,18 @@ $(document).ready(function() {
     $('select[name="food_item_id"]').change(function() {
         var selectedOption = $(this).find('option:selected');
         var unitName = selectedOption.data('unit-name');
-        $('.the-unit').text("x " + unitName);
+        var unitBaseQty = selectedOption.data('unit-base-qty');
+        $('.the-unit').text("x " + unitBaseQty + unitName);
         if (unitName) {
             $('input[name="multiplier"]').prop('disabled', false);
+            $('input[name="direct_kcal"]').prop('required', false);
+            $('input[name="direct_protein"]').prop('required', false);
+            $('input[name="direct_name"]').prop('required', false);
         } else {
             $('input[name="multiplier"]').prop('disabled', true);
+            $('input[name="direct_kcal"]').prop('required', true);
+            $('input[name="direct_protein"]').prop('required', true);
+            $('input[name="direct_name"]').prop('required', true);
         }
     });
 

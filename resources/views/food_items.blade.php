@@ -66,7 +66,7 @@
                 <form method="POST" action="{{ route('food-items.destroy', $foodItem->id) }}" class="d-inline">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-danger">
+                    <button type="submit" class="btn">
                         <i class="fa fa-trash"></i>
                     </button>
                 </form>

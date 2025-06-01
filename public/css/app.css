@@ -1,7 +1,12 @@
 .colorspan {
     font-weight: 600;
-    font-size: 20px;
+    font-size: 18px;
     text-align: right;
+}
+
+.largeish {
+    font-weight: 600;
+    font-size: 18px;
 }
 
 .bold {
@@ -13,6 +18,10 @@
 }
 
 td {
+    vertical-align: middle;
+}
+
+th {
     vertical-align: middle;
 }
 

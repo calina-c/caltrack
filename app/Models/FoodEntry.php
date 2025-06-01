@@ -14,6 +14,9 @@ class FoodEntry extends Model
         'multiplier',
         'ate_at',
         'description',
+        'direct_kcal',
+        'direct_protein',
+        'direct_name',
     ];
 
     public function foodItem()

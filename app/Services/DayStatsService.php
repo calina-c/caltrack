@@ -11,8 +11,8 @@ class DayStatsService
         $ranges = [
             'success' => [0, 1300],
             'info' => [1301, 1500],
-            'warning' => [1501, 1800],
-            'danger' => [2000, null],
+            'warning' => [1501, 2000],
+            'danger' => [2001, null],
         ];
 
         foreach ($ranges as $label => $range) {
