@@ -32,7 +32,7 @@
         @endphp
         <div class="tab-pane fade {{ $day == $selectedDayName ? 'active show' : '' }}" id="{{ strtolower($day) }}" role="tabpanel" aria-labelledby="{{ strtolower($day) }}-tab">
             <div class="table-responsive">
-                <table class="table table-striped">
+                <table class="table table-striped table-sm">
                     <thead>
                         <tr>
                             <th scope="col" style="width:15%">ora</th>
@@ -92,9 +92,6 @@
                         <tr class="inner-box">
                             <td colspan="6">
                             <!-- Button trigger modal -->
-                            <button type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#exampleModal" style="width: 100%;" id="addEntryButton">
-                                <i class="fa fa-plus"></i> Adaugă
-                            </button>
                             </td>
                         </tr>
                     </tbody>
@@ -144,6 +141,9 @@
             </div>
         </div>
         @endforeach
+        <button type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#exampleModal" style="width: 100%;" id="addEntryButton">
+            <i class="fa fa-plus"></i> Adaugă
+        </button>
     </div>
 
 <!-- Modal -->

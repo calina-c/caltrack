@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <!--  This file has been downloaded from bootdey.com @bootdey on twitter -->
     <!--  All snippets are MIT license http://bootdey.com/license -->
-    <title>Event Schedule list - Bootdey.com</title>
+    <title>Caltrack</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://bootswatch.com/5/brite/bootstrap.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap4.min.css">

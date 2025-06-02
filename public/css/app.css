@@ -1,12 +1,12 @@
 .colorspan {
     font-weight: 600;
-    font-size: 18px;
+    font-size: calc(0.75em + 0.6vmin);
     text-align: right;
 }
 
 .largeish {
     font-weight: 600;
-    font-size: 18px;
+    font-size: calc(0.75em + 0.6vmin);
 }
 
 .bold {
