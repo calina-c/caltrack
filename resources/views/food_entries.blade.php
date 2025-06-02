@@ -172,12 +172,6 @@
         <div class="form-row entryFormRow">
             <div class="col">
                 <select class="form-control @if ($errors->has('food_item_id')) is-invalid @endif" name="food_item_id">
-                    <option value="" data-unit-name="" data-unit-base-qty="">Selectează un aliment</option>
-                    @foreach($foodItems as $foodItem)
-                        <option value="{{ $foodItem->id }}" {{ old('food_item_id') == $foodItem->id ? 'selected' : '' }} data-unit-name="{{ $foodItem->unit_name }}" data-unit-base-qty="{{ $foodItem->unit_base_quantity }}">
-                            {{ $foodItem->name }} @if ($foodItem->brand) ({{ $foodItem->brand }}) @endif
-                        </option>
-                    @endforeach
                 </select>
             </div>
         </div>
@@ -253,28 +247,33 @@ $(document).ready(function() {
     $('select[name="food_item_id"]').selectize({
         'plugins': ["restore_on_backspace", "clear_button"],
         'maxItems': 1,
-    });
-    // Set the unit based on the selected food item
-    $('select[name="food_item_id"]').change(function() {
-        var selectedOption = $(this).find('option:selected');
-        var unitName = selectedOption.data('unit-name');
-        var unitBaseQty = selectedOption.data('unit-base-qty');
-        $('.the-unit').text("x " + unitBaseQty + unitName);
-        if (unitName) {
-            $('input[name="multiplier"]').prop('disabled', false);
-            $('input[name="direct_kcal"]').prop('required', false);
-            $('input[name="direct_protein"]').prop('required', false);
-            $('input[name="direct_name"]').prop('required', false);
-        } else {
-            $('input[name="multiplier"]').prop('disabled', true);
-            $('input[name="direct_kcal"]').prop('required', true);
-            $('input[name="direct_protein"]').prop('required', true);
-            $('input[name="direct_name"]').prop('required', true);
+        'options': [
+            @foreach($foodItems as $foodItem)
+                {
+                    value: "{{ $foodItem->id }}",
+                    text: "{{ $foodItem->name }} @if ($foodItem->brand) ({{ $foodItem->brand }}) @endif",
+                    unitName: "{{ $foodItem->unit_name }}",
+                    unitBaseQty: "{{ $foodItem->unit_base_quantity }}"
+                },
+            @endforeach
+        ],
+        onChange: function(value) {
+            var unitName = $("select[name]").data().selectize.options[value].unitName;
+            var unitBaseQty = $("select").data().selectize.options[value].unitBaseQty;
+            $('.the-unit').text("x " + unitBaseQty + unitName);
+            if (unitName) {
+                $('input[name="multiplier"]').prop('disabled', false);
+                $('input[name="direct_kcal"]').prop('required', false);
+                $('input[name="direct_protein"]').prop('required', false);
+                $('input[name="direct_name"]').prop('required', false);
+            } else {
+                $('input[name="multiplier"]').prop('disabled', true);
+                $('input[name="direct_kcal"]').prop('required', true);
+                $('input[name="direct_protein"]').prop('required', true);
+                $('input[name="direct_name"]').prop('required', true);
+            }
         }
     });
-
-    // Trigger change to set initial unit
-    $('select[name="food_item_id"]').trigger('change');
 
     $('.event-schedule-area-two ul.custom-tab li a').on('click', function() {
         var dateString = $(this).data('datestring');
