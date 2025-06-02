@@ -141,9 +141,11 @@
             </div>
         </div>
         @endforeach
+        @if(Auth::user()->name == 'Călina')
         <button type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#exampleModal" style="width: 100%;" id="addEntryButton">
             <i class="fa fa-plus"></i> Adaugă
         </button>
+        @endif
     </div>
 
 <!-- Modal -->

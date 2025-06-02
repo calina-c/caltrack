@@ -33,6 +33,21 @@
                     <li class="nav-item disabled">
                         <a class="nav-link" href="#" role="button"> 📆 Calendar</a>
                     </li>
+                    @if (Auth::user())
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                                @if (Auth::user()->name == 'Călina')👩🏻‍💻 @else 👱🏼‍♂️ @endif{{ Auth::user()->name }}
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <a class="dropdown-item" href="{{ route('logout') }}"
+                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Deconectare</a>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                @csrf
+                            </form>
+                        </div>
+                    </li>
+                    @endif
                 </ul>
             </div>
         </nav>
