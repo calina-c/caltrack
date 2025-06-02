@@ -92,7 +92,7 @@
                         <tr class="inner-box">
                             <td colspan="6">
                             <!-- Button trigger modal -->
-                            <button type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#exampleModal" style="width: 100%;">
+                            <button type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#exampleModal" style="width: 100%;" id="addEntryButton">
                                 <i class="fa fa-plus"></i> Adaugă
                             </button>
                             </td>
@@ -249,6 +249,11 @@
 
 @section('scripts')
 $(document).ready(function() {
+    // Initialize Selectize for the food item select
+    $('select[name="food_item_id"]').selectize({
+        'plugins': ["restore_on_backspace", "clear_button"],
+        'maxItems': 1,
+    });
     // Set the unit based on the selected food item
     $('select[name="food_item_id"]').change(function() {
         var selectedOption = $(this).find('option:selected');

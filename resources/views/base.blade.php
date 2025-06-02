@@ -8,6 +8,7 @@
     <title>Event Schedule list - Bootdey.com</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://bootswatch.com/5/brite/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap4.min.css">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 
 </head>
@@ -47,6 +48,8 @@
 
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src=" https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js"></script>
+
 
     <script type="text/javascript">
         @yield('scripts')
