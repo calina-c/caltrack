@@ -79,13 +79,21 @@
                                 </div>
                             </td>
                             <td class="text-center">
-                                <form method="POST" action="{{ route('food-entries.destroy', $entry->id) }}" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn" data-toggle="confirmation">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </form>
+                                @if(Auth::user()->name == 'Călina')
+                                    @if(!$value['dayObject'])
+                                    <form method="POST" action="{{ route('food-entries.destroy', $entry->id) }}" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn" data-toggle="confirmation">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </form>
+                                    @else
+                                    <button type="button" class="btn btn-secondary" disabled> <i class="fa fa-lock"> </i></button>
+                                    @endif
+                                @else
+                                <button type="button" class="btn btn-secondary" disabled> TODO: eval. aliment </button>
+                                @endif
                             </td>
                         </tr>
                         @endforeach
@@ -96,6 +104,7 @@
                         </tr>
                     </tbody>
                     <tfoot>
+                        @if(Auth::user()->name == 'Călina')
                         <tr class="inner-box">
                             <th scope="row">
                                 <div class="event-date">
@@ -134,17 +143,73 @@
                                     {{ 90 - $value['sumProtein'] }}g
                                 </span>
                             </td>
-                            <td class="text-center"></td>
+                            <td>
+                                @if(!$value['dayObject'])
+                                    <form method="POST" action="{{ route('days.store') }}" class="d-inline">
+                                        @csrf
+                                        <input type="hidden" name="date" value="{{ $value['date']->format('Y-m-d') }}">
+                                        <input type="hidden" name="done" value="1">
+                                        <button type="submit" class="btn btn-secondary btn-lg" id="addEntryButton">
+                                            <i class="fa fa-lock"></i> Închide ziua
+                                        </button>
+                                    </form>
+                                @else
+                                    <div style="vertical-align: middle; text-align:center;">Ziua este închisă.</div>
+                                @endif
+                            </td>
                         </tr>
+                        @else
+                        <tr>
+                            @if($value['dayObject'])
+                            @if ($value['dayObject']->done)
+                                @if ($value['dayObject']->rating)
+                                <td class="text-center" colspan="6">
+                                    <div class="largeish"> Ai acordat rating: </div>
+                                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <button type="button" class="btn btn-danger" value="1" @if($value['dayObject']->rating != 1) disabled @endif>😤 Jale extremală</button>
+                        <button type="button" class="btn btn-warning" value="2" @if($value['dayObject']->rating != 2) disabled @endif>🥴 Nasol</button>
+                        <button type="button" class="btn btn-secondary" value="3" @if($value['dayObject']->rating != 3) disabled @endif>🤷‍♂️ Meh</button>
+                        <button type="button" class="btn btn-info" value="4" @if($value['dayObject']->rating != 4) disabled @endif>✅ OK</button>
+                        <button type="button" class="btn btn-success" value="5" @if($value['dayObject']->rating != 5) disabled @endif>🎉 Forță</button>
+                                    </div>
+                                    <input type="hidden" name="rating" value="">
+                                    </form
+                                </td>
+                                @else
+                                <td class="text-center" colspan="6">
+                                    <form method="POST" action="{{ route('days.update', $value['dayObject']->id) }}" class="d-inline">
+                                    @csrf
+                                    <div class="largeish"> Adaugă rating: </div>
+                                    <div class="btn-group" role="group" aria-label="Basic example">
+                                        <button type="button" class="btn rating btn-danger" value="1">😤 Jale extremală</button>
+                                        <button type="button" class="btn rating btn-warning" value="2">🥴 Nasol</button>
+                                        <button type="button" class="btn rating btn-secondary" value="3">🤷‍♂️ Meh</button>
+                                        <button type="button" class="btn rating btn-info" value="4">✅ OK</button>
+                                        <button type="button" class="btn rating btn-success" value="5">🎉 Forță</button>
+                                    </div>
+                                    <input type="hidden" name="rating" value="">
+                                    </form
+                                </td>
+                            @endif
+                            @else
+                            <td class="text-center" colspan="6">
+                                <div class="largeish"> Ziua nu e gata încă. Ratingul mai trebuie să aștepte.</div>
+                            </td>
+                            @endif
+                            @endif
+                        </tr>
+                        @endif
                     </tfoot>
                 </table>
             </div>
         </div>
         @endforeach
         @if(Auth::user()->name == 'Călina')
-        <button type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#exampleModal" style="width: 100%;" id="addEntryButton">
-            <i class="fa fa-plus"></i> Adaugă
-        </button>
+            @if (!$value['dayObject'])
+            <button type="button" class="btn btn-success btn-lg" data-toggle="modal" data-target="#exampleModal" style="width: 100%;" id="addEntryButton">
+                <i class="fa fa-plus"></i> Adaugă
+            </button>
+            @endif
         @endif
     </div>
 
@@ -281,6 +346,12 @@ $(document).ready(function() {
         var dateString = $(this).data('datestring');
         $("[name='date']").val(dateString);
         $('.dt-badge').text('pentru ' + dateString);
+    });
+
+    $('.rating').on('click', function() {
+        var rating = $(this).val();
+        $(this).closest('form').find('input[name="rating"]').val(rating);
+        $(this).closest('form').submit();
     });
 });
 @endsection

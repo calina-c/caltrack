@@ -25,6 +25,8 @@ Route::post('/food-entries', [\App\Http\Controllers\Controller::class, 'addFoodE
 ;
 Route::delete('/food-entries/{id}', [\App\Http\Controllers\Controller::class, 'deleteFoodEntry'])->name('food-entries.destroy')->middleware('auth');
 ;
+Route::post('/days', [\App\Http\Controllers\Controller::class, 'addDay'])->name('days.store')->middleware('auth');
+Route::post('/days/{id}', [\App\Http\Controllers\Controller::class, 'editDay'])->name('days.update')->middleware('auth');
 
 Route::get('login', [\App\Http\Controllers\AuthController::class, 'showLoginForm'])->name('login');
 Route::post('login', [\App\Http\Controllers\AuthController::class, 'login'])->name('login.submit');
