@@ -342,6 +342,13 @@ $(document).ready(function() {
         }
     });
 
+    $('input[name="direct_name"]').on('input', function() {
+console.log($(this).val());
+        if ($(this).val().trim() !== '') {
+            $('select[name="food_item_id"]')[0].selectize.clear();
+        }
+    });
+
     $('.event-schedule-area-two ul.custom-tab li a').on('click', function() {
         var dateString = $(this).data('datestring');
         $("[name='date']").val(dateString);
