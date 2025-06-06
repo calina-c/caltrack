@@ -56,7 +56,7 @@
                             <td>
                                 <div class="r-no">
                                     <span>
-                                        {{ $entry->qtyForHumans }}
+                                        {!! $entry->qtyForHumans !!}
                                     </span>
                                 </div>
                             </td>
@@ -266,7 +266,7 @@
         </div>
         <div class="form-row entryFormRow">
             <div class="col-md-6 pull-left">
-                <input type="number" step="0.1" placeholder="fracție" class="form-control @if ($errors->has('multiplier')) is-invalid @endif " name="multiplier" value="{{ old('multiplier') }}" required>
+                <input type="number" step="0.1" placeholder="fracție" class="form-control @if ($errors->has('multiplier')) is-invalid @endif " name="multiplier" value="{{ old('multiplier') ?: 1 }}" required>
             </div>
             <div class="col">
                 <span class="the-unit" style="font-size:22px; vertical-align:middle; padding-left:10px"> x </span>
@@ -347,25 +347,26 @@ $(document).ready(function() {
             @endforeach
         ],
         onChange: function(value) {
-            var unitName = $("select[name]").data().selectize.options[value].unitName;
-            var unitBaseQty = $("select").data().selectize.options[value].unitBaseQty;
-            $('.the-unit').text("x " + unitBaseQty + unitName);
-            if (unitName) {
-                $('input[name="multiplier"]').prop('disabled', false);
-                $('input[name="direct_kcal"]').prop('required', false);
-                $('input[name="direct_protein"]').prop('required', false);
-                $('input[name="direct_name"]').prop('required', false);
-            } else {
+            if (!value) {
+                $('.the-unit').text('');
                 $('input[name="multiplier"]').prop('disabled', true);
                 $('input[name="direct_kcal"]').prop('required', true);
                 $('input[name="direct_protein"]').prop('required', true);
                 $('input[name="direct_name"]').prop('required', true);
+                return;
             }
+
+            $.get('/api/food-item-format/' + value, function(data) {
+                $('.the-unit').text('x ' + data.qtyForHumans);
+                $('input[name="multiplier"]').prop('disabled', false);
+                $('input[name="direct_kcal"]').prop('required', false);
+                $('input[name="direct_protein"]').prop('required', false);
+                $('input[name="direct_name"]').prop('required', false);
+            });
         }
     });
 
     $('input[name="direct_name"]').on('input', function() {
-console.log($(this).val());
         if ($(this).val().trim() !== '') {
             $('select[name="food_item_id"]')[0].selectize.clear();
         }

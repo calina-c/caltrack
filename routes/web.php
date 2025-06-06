@@ -31,3 +31,5 @@ Route::post('/days/{id}', [\App\Http\Controllers\Controller::class, 'editDay'])-
 Route::get('login', [\App\Http\Controllers\AuthController::class, 'showLoginForm'])->name('login');
 Route::post('login', [\App\Http\Controllers\AuthController::class, 'login'])->name('login.submit');
 Route::post('logout', [\App\Http\Controllers\AuthController::class, 'logout'])->name('logout')->middleware('auth');
+
+Route::get('/api/food-item-format/{id}', [\App\Http\Controllers\Controller::class, 'getFoodItemFormat'])->name('api.food-item-format')->middleware('auth');

@@ -221,4 +221,21 @@ class Controller extends BaseController
             'Ai dat rating.'
         )->withPreviousInput($request->all());
     }
+
+    public function getFoodItemFormat($id, FoodEntryService $foodEntryService)
+    {
+        // Find the food item by ID
+        $foodItem = \App\Models\FoodItem::findOrFail($id);
+        $entries = collect([$foodItem]);
+        $entries = $foodEntryService->addQtyForHumans(
+            $entries,
+            "unit_name",
+            "unit_base_quantity"
+        );
+
+        // Return the food item format as a JSON response
+        return response()->json($entries->first(), 200, [
+            'Content-Type' => 'application/json',
+        ]);
+    }
 }

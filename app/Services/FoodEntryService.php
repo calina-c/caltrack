@@ -48,23 +48,40 @@ class FoodEntryService
                 return $entry;
             }
 
+            $unitName = $entry->{$unit_name};
             $quantity = $entry->{$unit_quantity};
-            if ((int) ($quantity * 100) % 100) {
-                $quantity = number_format($quantity, 2, ',', '');
-            } else {
-                $quantity = (int) $quantity;
+
+            $pluralized = [
+                'ceașcă' => 'cești',
+                'felie' => 'felii',
+                'porție' => 'porții',
+                'lingură' => 'linguri',
+                'buc' => 'buc',
+            ];
+
+            if ($quantity != 1 && $quantity != 0.5 && isset($pluralized[$unitName])) {
+                $unitName = $pluralized[$unitName];
             }
 
-            # TODO: more implementations
-            switch ($entry->{$unit_name}) {
+            if ($quantity == 1 && array_key_exists($unitName, $pluralized)) {
+                $quantity = 'o';
+            } elseif ($quantity == 0.5 && array_key_exists($unitName, $pluralized)) {
+                $quantity = '<sup>1</sup>&frasl;<sub>2</sub>';
+                $quantity = $unitName == 'buc' ? $quantity : $quantity . ' de';
+            } else {
+                if ((int) ($quantity * 100) % 100) {
+                    $quantity = number_format($quantity, 2, ',', '');
+                } else {
+                    $quantity = (int) $quantity;
+                }
+            }
+
+            switch ($unitName) {
                 case 'g':
                     $entry->qtyForHumans = $quantity . 'g';
                     break;
-                case 'buc':
-                    $entry->qtyForHumans = $quantity . ' buc';
-                    break;
                 default:
-                    $entry->qtyForHumans = $quantity . ' ' . $entry->unit_name;
+                    $entry->qtyForHumans = $quantity . ' ' . $unitName;
             }
 
             return $entry;
