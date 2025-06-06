@@ -104,7 +104,6 @@
                         </tr>
                     </tbody>
                     <tfoot>
-                        @if(Auth::user()->name == 'Călina')
                         <tr class="inner-box">
                             <th scope="row">
                                 <div class="event-date">
@@ -124,41 +123,64 @@
                                         Total:
                                     </span>
                                     <br/>
+                                    @if(Auth::user()->name == 'Călina')
                                     <span class="badge badge-secondary">
                                         Rămase:
-                                    </span
+                                    </span>
+                                    @endif
                                 </div>
                             </td>
-                            <td class="table-{{ $value['kcalClass'] }}">
+                            <td class="table-{{ $value['kcalClass'] }}" style="text-align: center;">
                                 <span class="colorspan">{{ $value['sumKcal'] }} kcal</span>
                                 <br/>
+                                @if(Auth::user()->name == 'Călina')
                                 <span class="badge badge-{{ $value['kcalClass'] }}">
                                     {{ 1300 - $value['sumKcal'] }} kcal
-                                </div>
+                                </span>
+                                @endif
                             </td>
-                            <td class="table-{{ $value['proteinClass'] }}">
+                            <td class="table-{{ $value['proteinClass'] }}" style="text-align: center;">
                                 <span class="colorspan"> {{ $value['sumProtein'] }}g</span>
                                 <br/>
+                                @if(Auth::user()->name == 'Călina')
                                 <span class="badge badge-{{ $value['proteinClass'] }}">
                                     {{ 90 - $value['sumProtein'] }}g
                                 </span>
+                                @endif
                             </td>
-                            <td>
-                                @if(!$value['dayObject'])
-                                    <form method="POST" action="{{ route('days.store') }}" class="d-inline">
-                                        @csrf
-                                        <input type="hidden" name="date" value="{{ $value['date']->format('Y-m-d') }}">
-                                        <input type="hidden" name="done" value="1">
-                                        <button type="submit" class="btn btn-secondary btn-lg" id="addEntryButton">
-                                            <i class="fa fa-lock"></i> Închide ziua
-                                        </button>
-                                    </form>
-                                @else
-                                    <div style="vertical-align: middle; text-align:center;">Ziua este închisă.</div>
+                            <td style="text-align: center;">
+                                @if(Auth::user()->name == 'Călina')
+                                    @if(!$value['dayObject'])
+                                        <form method="POST" action="{{ route('days.store') }}" class="d-inline">
+                                            @csrf
+                                            <input type="hidden" name="date" value="{{ $value['date']->format('Y-m-d') }}">
+                                            <input type="hidden" name="done" value="1">
+                                            <button type="submit" class="btn btn-secondary btn-lg" id="addEntryButton">
+                                                <i class="fa fa-lock"></i> Închide ziua
+                                            </button>
+                                        </form>
+                                    @else
+                                        @if($value['dayObject']->rating)
+                                            <div class="largeish"> Ai primit rating: </div>
+                                                @if($value['dayObject']->rating == 1)
+                                                <button type="button" class="btn btn-danger" value="1" @if($value['dayObject']->rating != 1) disabled @endif>😤 Jale extremală</button>
+                                                @elseif($value['dayObject']->rating == 2)
+                                                <button type="button" class="btn btn-warning" value="2" @if($value['dayObject']->rating != 2) disabled @endif>🥴 Nasol</button>
+                                                @elseif($value['dayObject']->rating == 3)
+                                                <button type="button" class="btn btn-secondary" value="3" @if($value['dayObject']->rating != 3) disabled @endif>🤷‍♂️ Meh</button>
+                                                @elseif($value['dayObject']->rating == 4)
+                                                <button type="button" class="btn btn-info" value="4" @if($value['dayObject']->rating != 4) disabled @endif>✅ OK</button>
+                                                @else
+                                                <button type="button" class="btn btn-success" value="5" @if($value['dayObject']->rating != 5) disabled @endif>🎉 Forță</button>
+                                                @endif
+                                        @else
+                                        <div style="vertical-align: middle; text-align:center;">Ziua este închisă.</div>
+                                        @endif
+                                    @endif
                                 @endif
                             </td>
                         </tr>
-                        @else
+                        @if(Auth::user()->name != 'Călina')
                         <tr>
                             @if($value['dayObject'])
                             @if ($value['dayObject']->done)
