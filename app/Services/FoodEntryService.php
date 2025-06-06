@@ -57,6 +57,7 @@ class FoodEntryService
                 'porție' => 'porții',
                 'lingură' => 'linguri',
                 'buc' => 'buc',
+                'pumn' => 'pumni',
             ];
 
             if ($quantity != 1 && $quantity != 0.5 && isset($pluralized[$unitName])) {
@@ -64,10 +65,10 @@ class FoodEntryService
             }
 
             if ($quantity == 1 && array_key_exists($unitName, $pluralized)) {
-                $quantity = 'o';
+                $quantity = $unitName != 'pumn' ? 'o' : 'un';
             } elseif ($quantity == 0.5 && array_key_exists($unitName, $pluralized)) {
                 $quantity = '<sup>1</sup>&frasl;<sub>2</sub>';
-                $quantity = $unitName == 'buc' ? $quantity : $quantity . ' de';
+                $quantity = \in_array($unitName, ['buc']) ? $quantity : $quantity . ' de';
             } else {
                 if ((int) ($quantity * 100) % 100) {
                     $quantity = number_format($quantity, 2, ',', '');
