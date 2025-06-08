@@ -46,7 +46,7 @@
             <div style="margin-bottom:10px;" class="row">
             <div style="vertical-align: middle; text-align: center;" class="pull-left">
             <strong>{{ $goalType->name }}:</strong> {{ $goalProgress }} / {{ $goalType->target_qty }}
-            @if(Auth::user()->name == 'Călina')
+            @if(Auth::user()->name == 'Călina' && !$value['dayObject'])
             <form method="POST" action="{{ route('goals.update', $goalType->id) }}" class="d-inline">
                 @csrf
                 <input type="hidden" name="date" value="{{ $value['date']->format('Y-m-d') }}">
