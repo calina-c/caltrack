@@ -20,7 +20,7 @@
             <li class="nav-item">
                 <a class="nav-link {{ $day == $selectedDayName ? 'active show' : '' }}" id="{{ strtolower($day) }}-tab" data-toggle="tab" href="#{{ strtolower($day) }}" role="tab" aria-controls="{{ strtolower($day) }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}" data-datestring="{{ $value['date']->format('Y-m-d') }}">
                     <span class="span1">{{ $day }}</span><br/>
-                    <span class="small"> {{ $value['date']->format('j F') }}</span>
+                    <span class="small"> {{ $value['date']->format('j') }} {{ $roMonthNames[$value['date']->format('m')] }}</span>
                     </a>
             </li>
         @endforeach
@@ -30,7 +30,42 @@
         @php
             $day = $value['dayNameHuman'];
         @endphp
+        <div>
+        </div>
         <div class="tab-pane fade {{ $day == $selectedDayName ? 'active show' : '' }}" id="{{ strtolower($day) }}" role="tabpanel" aria-labelledby="{{ strtolower($day) }}-tab">
+            <div class="row" style="margin-bottom: 20px;">
+            <div class="col-md-12">
+                <h2 class="text-center" style="margin-bottom:15px;">{{ $day }} - {{ $value['date']->format('j') }} {{ $roMonthNames[$value['date']->format('m')] }} {{ $value["date"]->format('Y') }}</h2>
+            </div>
+            @foreach($goalTypes as $goalType)
+            <div class="col-md-{{ count($goalTypes) > 3 ? '6' : '4' }}">
+            @php
+                $goalProgress = $value["goals"]->has($goalType->id) ? $value["goals"][$goalType->id]->qty : 0;
+                $goalProgressPercentage = $goalType->target_qty > 0 ? ($goalProgress / $goalType->target_qty) * 100 : 0;
+            @endphp
+            <div style="margin-bottom:10px;" class="row">
+            <div style="vertical-align: middle; text-align: center;" class="pull-left">
+            <strong>{{ $goalType->name }}:</strong> {{ $goalProgress }} / {{ $goalType->target_qty }}
+            @if(Auth::user()->name == 'Călina')
+            <form method="POST" action="{{ route('goals.update', $goalType->id) }}" class="d-inline">
+                @csrf
+                <input type="hidden" name="date" value="{{ $value['date']->format('Y-m-d') }}">
+                <input type="hidden" name="goal_type_id" value="{{ $goalType->id }}">
+                <input type="hidden" name="qty" value="{{ $goalProgress + 1}}">
+                <button type="submit" class="btn btn-secondary btn-sm" style="margin-left: 10px;">
+                    <i class="fa fa-plus"></i>
+                </button>
+            </form>
+            @endif
+            </div>
+            </div>
+            <div class="progress" style="margin-bottom: 10px;" >
+                <div class="progress-bar progress-bar-striped" role="progressbar" style="width: {{ $goalProgressPercentage }}%" aria-valuenow="{{$goalProgress}}" aria-valuemin="0" aria-valuemax="{{ $goalType->target_qty }}">
+                </div>
+            </div>
+            </div>
+            @endforeach
+            </div>
             <div class="table-responsive">
                 <table class="table table-striped table-sm">
                     <thead>

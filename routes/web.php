@@ -33,3 +33,5 @@ Route::post('login', [\App\Http\Controllers\AuthController::class, 'login'])->na
 Route::post('logout', [\App\Http\Controllers\AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 Route::get('/api/food-item-format/{id}', [\App\Http\Controllers\Controller::class, 'getFoodItemFormat'])->name('api.food-item-format')->middleware('auth');
+
+Route::post('/goals/{goal_type_id}', [\App\Http\Controllers\GoalController::class, 'update'])->name('goals.update')->middleware('auth');

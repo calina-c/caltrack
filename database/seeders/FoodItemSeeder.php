@@ -219,8 +219,8 @@ class FoodItemSeeder extends Seeder
                 'brand' => null,
                 'unit_name' => 'g',
                 'unit_base_quantity' => 100.00,
-                'protein' => 240.00,
-                'kcal' => 18.00,
+                'kcal' => 240.00,
+                'protein' => 18.00,
             ],
             [
                 'name' => 'Peanut Butter HP cu salted caramel',
@@ -233,8 +233,13 @@ class FoodItemSeeder extends Seeder
         ];
 
         foreach ($data as $item) {
-            \App\Models\FoodItem::updateOrCreate(
-                ['name' => $item['name'], 'brand' => $item['brand']],
+            if (\App\Models\FoodItem::where('name', $item['name'])
+                ->where('brand', $item['brand'])
+                ->exists()) {
+                continue; // Skip if the item already exists
+            }
+
+            \App\Models\FoodItem::create(
                 [
                     'unit_name' => $item['unit_name'],
                     'unit_base_quantity' => $item['unit_base_quantity'],

@@ -48,19 +48,35 @@ class Controller extends BaseController
                 'dayObject' => \App\Models\Day::where([
                     'date' => $currentDate->format('Y-m-d'),
                 ])->first(),
+                'goals' => \App\Models\Goal::where([
+                    'date' => $currentDate->format('Y-m-d'),
+                ])->get()->keyBy('goal_type_id'),
             ]);
             $currentDate->addDay();
         }
 
         return view('food_entries', [
             'foodEntries' => $allWeekDates,
-            # TODO: selectize
-            # for selector to create new food entries
             'foodItems' => \App\Models\FoodItem::orderBy('name')->get(),
             'startDate' => $startDate,
             'endDate' => $endDate,
             'selectedDay' => $selectedDate,
             'selectedDayName' => $namesOfDays[($selectedDate->dayOfWeek + 6) % 7],
+            'goalTypes' => \App\Models\GoalType::where('is_current', true)->get(),
+            'roMonthNames' => [
+                '01' => 'Ianuarie',
+                '02' => 'Februarie',
+                '03' => 'Martie',
+                '04' => 'Aprilie',
+                '05' => 'Mai',
+                '06' => 'Iunie',
+                '07' => 'Iulie',
+                '08' => 'August',
+                '09' => 'Septembrie',
+                '10' => 'Octombrie',
+                '11' => 'Noiembrie',
+                '12' => 'Decembrie',
+            ],
         ]);
     }
 
