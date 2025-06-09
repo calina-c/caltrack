@@ -9,13 +9,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://bootswatch.com/5/brite/bootstrap.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap4.min.css">
+    <link href="{{ asset('fontawesome-free-6.7.2-web/css/fontawesome.css') }}" rel="stylesheet">
+    <link href="{{ asset('fontawesome-free-6.7.2-web/css/solid.css') }}" rel="stylesheet">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 
 </head>
 
 <body>
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
-
     <div class="event-schedule-area-two bg-color pad100">
 
         <nav class="navbar navbar-expand-lg mainnav" style="background-color: rgb(104, 211, 145);">

@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             FoodItemSeeder::class,
             UserSeeder::class,
             GoalTypeSeeder::class,
+            ExerciseTypeSeeder::class,
         ]);
     }
 }

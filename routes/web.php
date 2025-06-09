@@ -38,3 +38,6 @@ Route::post('/days/{id}', [\App\Http\Controllers\DayController::class, 'editDay'
 
 # Goal Management Routes
 Route::post('/goals/{goal_type_id}', [\App\Http\Controllers\GoalController::class, 'update'])->name('goals.update')->middleware('auth');
+
+# Exercise Management Routes
+Route::post('/exercises', [\App\Http\Controllers\ExerciseController::class, 'addExercise'])->name('exercises.store')->middleware('auth');

@@ -33,10 +33,25 @@
         <div>
         </div>
         <div class="tab-pane fade {{ $day == $selectedDayName ? 'active show' : '' }}" id="{{ strtolower($day) }}" role="tabpanel" aria-labelledby="{{ strtolower($day) }}-tab">
-            <div class="row" style="margin-bottom: 20px;">
-            <div class="col-md-12">
-                <h2 class="text-center" style="margin-bottom:15px;">{{ $day }} - {{ $value['date']->format('j') }} {{ $roMonthNames[$value['date']->format('m')] }} {{ $value["date"]->format('Y') }}</h2>
+            <div class="row" style="margin-bottom: 10px;">
+                <h2 class="text-center">{{ $day }} - {{ $value['date']->format('j') }} {{ $roMonthNames[$value['date']->format('m')] }} {{ $value["date"]->format('Y') }}</h2>
             </div>
+            <div class="row" style="margin-bottom: 30px;">
+                <div class="d-flex justify-content-center align-items-center">
+                @foreach ($value['exercises'] as $exercise)
+                    <div class="mx-2">
+                        <i class="fa fa-3x fa-{{ $exercise->exerciseType->icon }}"></i>
+                        <strong>{{ $exercise->exerciseType->name }}</strong> {{ $exercise->description }}
+                    </div>
+                @endforeach
+                @if(Auth::user()->name == 'Călina' && !$value['dayObject'])
+                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#excModal">
+                        <i class="fa fa-plus"></i> Adaugă exercițiu
+                    </button>
+                @endif
+                </div>
+            </div>
+            <div class="row" style="margin-bottom: 20px;">
             @foreach($goalTypes as $goalType)
             <div class="col-md-{{ count($goalTypes) > 3 ? '6' : '4' }}">
             @php
@@ -341,6 +356,43 @@
 </div>
 </div>
 
+<!-- Modal for adding exercise -->
+<div class="modal fade" id="excModal" tabindex="-1" role="dialog" aria-labelledby="excModalLabel" aria-hidden="true">
+    <form method="POST" action="{{ route('exercises.store') }}">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="excModalLabel">Adaugă exercițiu</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @csrf
+                    <input type="hidden" class="exerciseDate" name="date" value="{{ $selectedDay->format('Y-m-d') }}">
+                <div class="form-group
+                    <label for="exercise_type_id">Tip exercițiu</label>
+                    <select class="form-control @if ($errors->has('exercise_type_id')) is-invalid @endif" name="exercise_type_id" required>
+                        <option value="">Selectează tipul de exercițiu</option>
+                        @foreach($exerciseTypes as $exerciseType)
+                            <option value="{{ $exerciseType->id }}">{{ $exerciseType->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="label">Etichetă</label>
+                    <input type="text" class="form-control @if ($errors->has('label')) is-invalid @endif" name="label" value="{{ old('label') }}" placeholder="Scurtă descriere">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Renunță</button>
+                <button type="submit" class="btn btn-primary">Adaugă exercițiu</button>
+            </div>
+        </div>
+    </div>
+    </form>
+</div>
+
 
     <nav style="margin-top: 20px;">
     <ul class="pagination pagination-sm justify-content-center">
@@ -411,6 +463,7 @@ $(document).ready(function() {
         var dateString = $(this).data('datestring');
         $("[name='date']").val(dateString);
         $('.dt-badge').text('pentru ' + dateString);
+        $('.exerciseDate').val(dateString);
     });
 
     $('.rating').on('click', function() {
