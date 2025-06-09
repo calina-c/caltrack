@@ -201,7 +201,7 @@ class FoodItemSeeder extends Seeder
                 'brand' => null,
                 'unit_base_quantity' => 1,
                 'unit_name' => 'ceașcă',
-                'unit_base_quantity' => 100.00,
+                'unit_base_quantity' => 1,
                 'protein' => 3.40,
                 'kcal' => 64.00,
             ],
