@@ -66,7 +66,7 @@ class FoodEntriesController extends Controller
             'selectedDay' => $selectedDate,
             'selectedDayName' => $namesOfDays[($selectedDate->dayOfWeek + 6) % 7],
             'goalTypes' => \App\Models\GoalType::where('is_current', true)->get(),
-            'exerciseTypes' => \App\Models\ExerciseType::orderBy('name')->get(),
+            'exerciseTypes' => \App\Models\ExerciseType::orderBy('id')->get(),
             'roMonthNames' => [
                 '01' => 'Ianuarie',
                 '02' => 'Februarie',

@@ -41,7 +41,7 @@
                 @foreach ($value['exercises'] as $exercise)
                     <div class="mx-2">
                         <i class="fa fa-3x fa-{{ $exercise->exerciseType->icon }}"></i>
-                        <strong>{{ $exercise->exerciseType->name }}</strong> {{ $exercise->description }}
+                        <strong>{{ $exercise->exerciseType->name }}</strong> {{ $exercise->label }}
                     </div>
                 @endforeach
                 @if(Auth::user()->name == 'Călina' && !$value['dayObject'])
@@ -363,9 +363,6 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="excModalLabel">Adaugă exercițiu</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
             </div>
             <div class="modal-body">
                 @csrf
@@ -373,7 +370,6 @@
                 <div class="form-group
                     <label for="exercise_type_id">Tip exercițiu</label>
                     <select class="form-control @if ($errors->has('exercise_type_id')) is-invalid @endif" name="exercise_type_id" required>
-                        <option value="">Selectează tipul de exercițiu</option>
                         @foreach($exerciseTypes as $exerciseType)
                             <option value="{{ $exerciseType->id }}">{{ $exerciseType->name }}</option>
                         @endforeach
@@ -451,6 +447,33 @@ $(document).ready(function() {
                 $('input[name="direct_name"]').prop('required', false);
             });
         }
+    });
+
+    $('select[name="exercise_type_id"]').selectize({
+        'plugins': ["restore_on_backspace", "clear_button"],
+        'maxItems': 1,
+        'options': [
+            @foreach($exerciseTypes as $exerciseType)
+                {
+                    value: "{{ $exerciseType->id }}",
+                    text: "{{ $exerciseType->name }}",
+                    icon: "{{ $exerciseType->icon }}"
+                },
+            @endforeach
+        ],
+        render: {
+            option: function(item, escape) {
+                return '<div style="padding: 5px 5px 5px 5px;">' +
+                    '<i style="width: 35px; margin-right: 10px; text-align: center;" class="fa fa-2x fa-' + item.icon + '"/></i><span>' + escape(item.text) + '</span>' +
+                    '</div>';
+            },
+            item: function(item, escape) {
+                return '<div style="padding: 5px 5px 5px 5px;">' +
+                    '<i style="width: 35px; margin-right: 10px; text-align: center;" class="fa fa-2x fa-' + item.icon + '"/></i><span>' + escape(item.text) + '</span>' +
+                    '</div>';
+            }
+        }
+
     });
 
     $('input[name="direct_name"]').on('input', function() {

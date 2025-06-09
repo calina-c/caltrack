@@ -13,11 +13,11 @@ class ExerciseController extends Controller
         $validatedData = $request->validate([
             'date' => 'required|date',
             'exercise_type_id' => 'required|exists:exercise_types,id',
-            'label' => 'sometimes'
+            'label' => 'sometimes',
         ]);
 
         // Create a new exercise record
-        $exercise = new \App\Models\Exercise();
+        $exercise = new \App\Models\Exercise;
         $exercise->date = $request->input('date');
         $exercise->exercise_type_id = $request->input('exercise_type_id');
         $exercise->label = $request->input('label');
