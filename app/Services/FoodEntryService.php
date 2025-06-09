@@ -4,7 +4,6 @@ namespace App\Services;
 
 use Carbon\Carbon;
 use DB;
-use App\Models\FoodEntry;
 
 class FoodEntryService
 {
@@ -22,8 +21,8 @@ class FoodEntryService
                 'COALESCE(direct_kcal, multiplier * food_items.kcal) as kcal, '.
                 'COALESCE(direct_protein, multiplier * food_items.protein) as protein '
             )
-            ->where('ate_at', '>=', $startDate->format("Y-m-d"))
-            ->where('ate_at', '<=', $endDate->format("Y-m-d") . ' 23:59:59')
+            ->where('ate_at', '>=', $startDate->format('Y-m-d'))
+            ->where('ate_at', '<=', $endDate->format('Y-m-d').' 23:59:59')
             ->orderBy('ate_at')
             ->get();
 
@@ -43,8 +42,9 @@ class FoodEntryService
     public function addQtyForHumans($entries, $unit_name, $unit_quantity)
     {
         $entries = $entries->map(function ($entry) use ($unit_name, $unit_quantity) {
-            if (!isset($entry->{$unit_name}) || !isset($entry->{$unit_quantity})) {
+            if (! isset($entry->{$unit_name}) || ! isset($entry->{$unit_quantity})) {
                 $entry->qtyForHumans = 'N/A';
+
                 return $entry;
             }
 
@@ -68,7 +68,7 @@ class FoodEntryService
                 $quantity = $unitName != 'pumn' ? 'o' : 'un';
             } elseif ($quantity == 0.5 && array_key_exists($unitName, $pluralized)) {
                 $quantity = '<sup>1</sup>&frasl;<sub>2</sub>';
-                $quantity = \in_array($unitName, ['buc']) ? $quantity : $quantity . ' de';
+                $quantity = \in_array($unitName, ['buc']) ? $quantity : $quantity.' de';
             } else {
                 if ((int) ($quantity * 100) % 100) {
                     $quantity = number_format($quantity, 2, ',', '');
@@ -79,10 +79,10 @@ class FoodEntryService
 
             switch ($unitName) {
                 case 'g':
-                    $entry->qtyForHumans = $quantity . 'g';
+                    $entry->qtyForHumans = $quantity.'g';
                     break;
                 default:
-                    $entry->qtyForHumans = $quantity . ' ' . $unitName;
+                    $entry->qtyForHumans = $quantity.' '.$unitName;
             }
 
             return $entry;

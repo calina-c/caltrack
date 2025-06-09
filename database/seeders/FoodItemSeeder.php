@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class FoodItemSeeder extends Seeder
@@ -201,7 +200,7 @@ class FoodItemSeeder extends Seeder
                 'name' => 'ceai cu lapte',
                 'brand' => null,
                 'unit_base_quantity' => 1,
-                'unit_name' => "ceașcă",
+                'unit_name' => 'ceașcă',
                 'unit_base_quantity' => 100.00,
                 'protein' => 3.40,
                 'kcal' => 64.00,
@@ -229,7 +228,7 @@ class FoodItemSeeder extends Seeder
                 'unit_base_quantity' => 100.00,
                 'protein' => 33.00,
                 'kcal' => 582.00,
-            ]
+            ],
         ];
 
         foreach ($data as $item) {
@@ -244,7 +243,7 @@ class FoodItemSeeder extends Seeder
                     'unit_name' => $item['unit_name'],
                     'unit_base_quantity' => $item['unit_base_quantity'],
                     'protein' => $item['protein'],
-                    'kcal' => $item['kcal']
+                    'kcal' => $item['kcal'],
                 ]
             );
         }

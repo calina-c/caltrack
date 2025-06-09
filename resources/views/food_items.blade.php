@@ -23,6 +23,7 @@
                     <th scope="col"></th>
                 </tr>
 
+                @if (Auth::user() && Auth::user()->name == 'Călina')
                 <form method="POST" action="{{ route('food-items.store') }}">
                     @csrf
                     <tr class="bg-success text-white">
@@ -63,6 +64,18 @@
                         </th>
                     </tr>
                 </form>
+                @endif
+                    <tr>
+                        <th scope="col" colspan="2" class="text-center">
+                            <form method="GET" action="{{ route('food-items.index') }}" >
+                            <input type="text" class="form-control" name="search"
+                                placeholder="Caută după nume sau brand" value="{{ request('search') }}">
+                            </form>
+                        </th>
+                        <th colspan="4">
+                            <button type="submit" class="btn btn-secondary mt-2">Caută</button>
+                        </th>
+                    </tr>
             </thead>
             <tbody>
                 @foreach ($foodItems as $foodItem)
@@ -73,7 +86,7 @@
                         <td>{{ number_format($foodItem->kcal, 0) }}</td>
                         <td>{{ number_format($foodItem->protein, 2) }}</td>
                         <td class="text-center">
-                            @if (!$foodItem->entries->count())
+                            @if (!$foodItem->entries->count() && Auth::user())
                                 <form method="POST" action="{{ route('food-items.destroy', $foodItem->id) }}"
                                     class="d-inline">
                                     @csrf

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 
 class AuthController extends Controller
 {
@@ -19,7 +20,6 @@ class AuthController extends Controller
     /**
      * Handle a login request to the application.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function login(Request $request)
@@ -33,7 +33,7 @@ class AuthController extends Controller
         }
 
         return back()->withErrors([
-            'username' => 'Nu-i asta.'
+            'username' => 'Nu-i asta.',
         ]);
     }
 
@@ -45,6 +45,7 @@ class AuthController extends Controller
     public function logout()
     {
         auth()->logout();
+
         return redirect('/login')->with('status', 'Bine, pa.');
     }
 }

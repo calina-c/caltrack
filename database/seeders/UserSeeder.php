@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -13,7 +12,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        if (!env('PLEB_PASSWORD') || !env('TRAINER_PASSWORD')) {
+        if (! env('PLEB_PASSWORD') || ! env('TRAINER_PASSWORD')) {
             throw new \Exception('Please set PLEB_PASSWORD and TRAINER_PASSWORD in your .env file.');
         }
 
@@ -30,7 +29,7 @@ class UserSeeder extends Seeder
                 'email' => 'cristi',
                 'name' => 'Cristi',
                 'password' => $password2,
-            ]
+            ],
         ];
 
         foreach ($data as $item) {

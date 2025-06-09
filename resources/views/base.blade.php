@@ -21,18 +21,22 @@
         <nav class="navbar navbar-expand-lg mainnav" style="background-color: rgb(104, 211, 145);">
             <div class="collapse navbar-collapse" id="navbarNavDropdown">
                 <ul class="navbar-nav">
+                    @if (Auth::user())
                     <li class="nav-item active">
                         <a class="nav-link" href="{{ route('food-entries.index') }}" role="button"> 🍗 Jurnal</a>
                     </li>
+                    @endif
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('food-items.index') }}" role="button"> 📋 Catalog</a>
                     </li>
+                    @if (Auth::user())
                     <li class="nav-item disabled">
                         <a class="nav-link" href="#" role="button"> 🏋️‍♀️ Exerciții</a>
                     </li>
                     <li class="nav-item disabled">
                         <a class="nav-link" href="#" role="button"> 📆 Calendar</a>
                     </li>
+                    @endif
                     @if (Auth::user())
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown"
@@ -47,6 +51,9 @@
                             </form>
                         </div>
                     </li>
+                    @else
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('login') }}" role="button"> 🔑 Autentificare</a>
                     @endif
                 </ul>
             </div>
