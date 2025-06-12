@@ -22,4 +22,9 @@ class FoodItem extends Model
     {
         return $this->hasMany(FoodEntry::class);
     }
+
+    public function thumbs()
+    {
+        return $this->hasOne(Thumbs::class);
+    }
 }

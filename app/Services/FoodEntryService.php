@@ -9,13 +9,13 @@ class FoodEntryService
 {
     public function getGroupedFoodEntries($startDate = null, $endDate = null)
     {
-        $foodEntries = DB::table('food_entries')
-            ->leftJoin('food_items', 'food_entries.food_item_id', '=', 'food_items.id')
+        $foodEntries = \App\Models\FoodEntry::leftJoin('food_items', 'food_entries.food_item_id', '=', 'food_items.id')
             ->selectRaw(
                 'food_entries.id, '.
                 'food_entries.description, '.
                 'food_entries.ate_at, '.
                 'food_items.unit_name, '.
+                'food_items.id as food_item_id, '.
                 'COALESCE(direct_name, food_items.name) as food_name, '.
                 'COALESCE(multiplier * food_items.unit_base_quantity, NULL) as total_quantity, '.
                 'COALESCE(direct_kcal, multiplier * food_items.kcal) as kcal, '.

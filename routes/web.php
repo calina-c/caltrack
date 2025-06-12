@@ -41,3 +41,6 @@ Route::post('/goals/{goal_type_id}', [\App\Http\Controllers\GoalController::clas
 
 // Exercise Management Routes
 Route::post('/exercises', [\App\Http\Controllers\ExerciseController::class, 'addExercise'])->name('exercises.store')->middleware('auth');
+
+// Thumbs Management Routes
+Route::post('/thumbs', [\App\Http\Controllers\ThumbsController::class, 'addThumb'])->name('thumbs.store')->middleware('auth');

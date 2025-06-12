@@ -112,7 +112,12 @@
                             </td>
                             <td>
                                 <div class="r-no">
-                                    <div class="largeish">{{ $entry->food_name }}</div>
+                                    <div class="largeish">
+                                        {{ $entry->food_name }}
+                                        @if ($entry->hasThumbs())
+                                        <span><i class="fa fa-thumbs-{{$entry->getThumbsTypeAttribute()}}"></i></span>
+                                        @endif
+                                    </div>
                                     <div class="meta">
                                         {{ $entry->description }}
                                     </div>
@@ -142,7 +147,25 @@
                                     <button type="button" class="btn btn-secondary" disabled> <i class="fa fa-lock"> </i></button>
                                     @endif
                                 @else
-                                <button type="button" class="btn btn-secondary" disabled> TODO: eval. aliment </button>
+                                @if (!$entry->hasThumbs())
+                                @php
+                                    if ($entry->food_item_id) {
+                                        $action = route('thumbs.store', ['food_entry_id' => $entry->id, 'food_item_id' => $entry->food_item_id]);
+                                    } else {
+                                        $action = route('thumbs.store', ['food_entry_id' => $entry->id]);
+                                    }
+                                @endphp
+                                <form method="POST" action="{{ $action }}" class="d-inline">
+                                    @csrf
+                                    <input type="hidden" name="date" value="{{ $value['date']->format('Y-m-d') }}">
+                                    <button type="submit" name="type" value="up" class="btn btn-success" data-toggle="confirmation">
+                                        <i class="fa fa-thumbs-up"></i>
+                                    </button>
+                                    <button type="submit" name="type" value="down" class="btn btn-danger" data-toggle="confirmation">
+                                        <i class="fa fa-thumbs-down"></i>
+                                    </button>
+                                </form>
+                                @endif
                                 @endif
                             </td>
                         </tr>
