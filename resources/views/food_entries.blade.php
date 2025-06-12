@@ -416,16 +416,16 @@
     <nav style="margin-top: 20px;">
     <ul class="pagination pagination-sm justify-content-center">
         <li class="page-item">
-            <a href="{{ route('food-entries.index', ['date' => (clone $startDate)->subDays(14)->format('Y-m-d')])}}" class="btn btn-primary mb-3"> << </a>
+            <a href="{{ route('food-entries.index', ['date' => (clone $startDate)->subDays(8)->format('Y-m-d')])}}" class="btn btn-primary mb-3"> << </a>
         </li>
         <li class="page-item">
-            <a href="{{ route('food-entries.index', ['date' => (clone $startDate)->subDays(7)->format('Y-m-d')])}}" class="btn btn-primary mb-3"> < </a>
+            <a href="{{ route('food-entries.index', ['date' => (clone $startDate)->subDays(1)->format('Y-m-d')])}}" class="btn btn-primary mb-3"> < </a>
         </li>
         <li class="page-item">
-            <a href="{{ route('food-entries.index', ['date' => (clone $endDate)->addDays(7)->format('Y-m-d')])}}" class="btn btn-primary mb-3"> > </a>
+            <a href="{{ route('food-entries.index', ['date' => (clone $endDate)->addDays(1)->format('Y-m-d')])}}" class="btn btn-primary mb-3"> > </a>
         </li>
         <li class="page-item">
-            <a href="{{ route('food-entries.index', ['date' => (clone $endDate)->addDays(7)->format('Y-m-d')])}}" class="btn btn-primary mb-3"> >> </a>
+            <a href="{{ route('food-entries.index', ['date' => (clone $endDate)->addDays(8)->format('Y-m-d')])}}" class="btn btn-primary mb-3"> >> </a>
         </li>
         &nbsp;
         <li class="page-item">
