@@ -58,6 +58,12 @@ class FoodEntriesController extends Controller
             $currentDate->addDay();
         }
 
+        $lastUnreviewed = \App\Models\Day::where('done', true)
+            ->whereNull('rating')
+            ->where('date', '>=', '2025-06-01') // release date
+            ->orderBy('date', 'asc')
+            ->first();
+
         return view('food_entries', [
             'foodEntries' => $allWeekDates,
             'foodItems' => \App\Models\FoodItem::orderBy('name')->get(),
@@ -67,6 +73,7 @@ class FoodEntriesController extends Controller
             'selectedDayName' => $namesOfDays[($selectedDate->dayOfWeek + 6) % 7],
             'goalTypes' => \App\Models\GoalType::where('is_current', true)->get(),
             'exerciseTypes' => \App\Models\ExerciseType::orderBy('id')->get(),
+            'lastUnreviewedDate' => $lastUnreviewed ?->date->format('Y-m-d'),
             'roMonthNames' => [
                 '01' => 'Ianuarie',
                 '02' => 'Februarie',
