@@ -16,49 +16,49 @@
 </head>
 
 <body>
+    <nav class="navbar mainnav navbar-expand-lg navbar-light" style="background-color: rgb(104, 211, 145);">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse justify-content-between" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            @if (Auth::user())
+            <li class="nav-item active">
+                <a class="nav-link" href="{{ route('food-entries.index') }}" role="button"> 🍗 Jurnal</a>
+            </li>
+            @endif
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('food-items.index') }}" role="button"> 📋 Catalog</a>
+            </li>
+            @if (Auth::user())
+            <li class="nav-item disabled">
+                <a class="nav-link" href="#" role="button"> 🏋️‍♀️ Exerciții</a>
+            </li>
+            <li class="nav-item disabled">
+                <a class="nav-link" href="#" role="button"> 📆 Calendar</a>
+            </li>
+            @endif
+        </ul>
+            @if (Auth::user())
+            <span class="navbar-text dropdown" style="margin-right: 20px;">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
+                        @if (Auth::user()->name == 'Călina')👩🏻‍💻 @else 👱🏼‍♂️ @endif{{ Auth::user()->name }}
+                </a>
+                <div class="dropdown-menu logoutButton" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" href="{{ route('logout') }}"
+                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Deconectare</a>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                        @csrf
+                    </form>
+                </div>
+            </span>
+            @endif
+    </div>
+    </nav>
+
     <div class="event-schedule-area-two bg-color pad100">
-
-        <nav class="navbar navbar-expand-lg mainnav" style="background-color: rgb(104, 211, 145);">
-            <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                <ul class="navbar-nav">
-                    @if (Auth::user())
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{{ route('food-entries.index') }}" role="button"> 🍗 Jurnal</a>
-                    </li>
-                    @endif
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('food-items.index') }}" role="button"> 📋 Catalog</a>
-                    </li>
-                    @if (Auth::user())
-                    <li class="nav-item disabled">
-                        <a class="nav-link" href="#" role="button"> 🏋️‍♀️ Exerciții</a>
-                    </li>
-                    <li class="nav-item disabled">
-                        <a class="nav-link" href="#" role="button"> 📆 Calendar</a>
-                    </li>
-                    @endif
-                    @if (Auth::user())
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">
-                                @if (Auth::user()->name == 'Călina')👩🏻‍💻 @else 👱🏼‍♂️ @endif{{ Auth::user()->name }}
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                            <a class="dropdown-item" href="{{ route('logout') }}"
-                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Deconectare</a>
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                @csrf
-                            </form>
-                        </div>
-                    </li>
-                    @else
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('login') }}" role="button"> 🔑 Autentificare</a>
-                    @endif
-                </ul>
-            </div>
-        </nav>
-
         <div class="container">
             <!-- row end-->
             <div class="row">

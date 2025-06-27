@@ -50,3 +50,9 @@ th {
     transform: translate(-3px, -3px);
     border-radius: 5px;
 }
+
+@media only screen and (min-width: 1000px) {
+    .logoutButton {
+        margin-left: -60px;
+    }
+}

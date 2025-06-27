@@ -415,9 +415,11 @@
 
     <nav style="margin-top: 20px;">
     <ul class="pagination pagination-sm justify-content-center">
+        @if (Auth::user()->name == 'Cristi')
         <li class="page-item">
             <a href="{{ route('food-entries.index', ['date' => $lastUnreviewedDate])}}" class="btn btn-primary mb-3 @if (!$lastUnreviewedDate) disabled @endif"> Ultima nevăzută </a>
         </li>
+        @endif
         <li class="page-item">
             <a href="{{ route('food-entries.index', ['date' => (clone $startDate)->subDays(8)->format('Y-m-d')])}}" class="btn btn-primary mb-3"> << </a>
         </li>

@@ -41,7 +41,7 @@ class DayController extends Controller
         $day->rating = $validatedData['rating'];
         $day->save();
 
-        return redirect()->route('food-entries.index', ['date' => $day->date->format('Y-m-d')])->with(
+        return redirect()->route('food-entries.index', ['date' => $day->date->addDay()->format('Y-m-d')])->with(
             'success',
             'Ai dat rating.'
         )->withPreviousInput($request->all());
