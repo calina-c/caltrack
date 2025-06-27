@@ -1,6 +1,18 @@
 @extends('base')
 @section('content')
 <div class="col-lg-12">
+    @foreach ($notifications as $notification)
+    <div class="alert alert-info justify-content-between">
+        <span>{{ $notification->description }}</span>
+        <a type="button" class="btn slimbtn" href="{{ route('food-entries.index', json_decode($notification->data, true)["date"] ) }}">
+            mergi la zi
+        </a>
+        <a type="button" class="btn close slimbtn" aria-label="Close" href="{{ route('notification.read', $notification->id) }}">
+            <span aria-hidden="true">&times;</span>
+        </a>
+    </div>
+    @endforeach
+
     @if ($errors->any())
     @foreach ($errors->all() as $error)
         <div class="alert alert-danger">{{ $error }}</div>

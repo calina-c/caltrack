@@ -74,6 +74,10 @@ class FoodEntriesController extends Controller
             'goalTypes' => \App\Models\GoalType::where('is_current', true)->get(),
             'exerciseTypes' => \App\Models\ExerciseType::orderBy('id')->get(),
             'lastUnreviewedDate' => $lastUnreviewed ?->date->format('Y-m-d'),
+            'notifications' => \App\Models\Notification::where('user_id', auth()->id())
+                ->whereNull('read_at')
+                ->orderBy('created_at', 'desc')
+                ->get(),
             'roMonthNames' => [
                 '01' => 'Ianuarie',
                 '02' => 'Februarie',

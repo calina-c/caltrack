@@ -44,3 +44,6 @@ Route::post('/exercises', [\App\Http\Controllers\ExerciseController::class, 'add
 
 // Thumbs Management Routes
 Route::post('/thumbs', [\App\Http\Controllers\ThumbsController::class, 'addThumb'])->name('thumbs.store')->middleware('auth');
+
+// Notification Routes
+Route::get('/notification/read/{id}', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notification.read')->middleware('auth');

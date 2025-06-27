@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
@@ -40,6 +42,25 @@ class DayController extends Controller
         // Update the day entry
         $day->rating = $validatedData['rating'];
         $day->save();
+
+        $mapping = [
+            1 => 'Jale extremală',
+            2 => 'Nasol',
+            3 => 'Meh',
+            4 => 'OK',
+            5 => 'Forță',
+        ];
+
+        $notification = Notification::create([
+            'user_id' => User::where('Name', 'Călina')->first()->id,
+            'description' => "Ai primit rating de {$mapping[$day->rating]} pentru ziua de {$day->date->format('Y-m-d')}.",
+            'data' => json_encode([
+                'day_id' => $day->id,
+                'rating' => $day->rating,
+                'date' => $day->date->format('Y-m-d'),
+            ]),
+        ]);
+        $notification->save();
 
         return redirect()->route('food-entries.index', ['date' => $day->date->addDay()->format('Y-m-d')])->with(
             'success',
