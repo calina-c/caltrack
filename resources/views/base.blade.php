@@ -49,7 +49,7 @@
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fa-solid fa-calculator"></i>
                         </a>
-                        <div class="dropdown-menu logoutButton" aria-labelledby="navbarDropdownMenuLink1">
+                            <div class="dropdown-menu logoutButton @if(!Auth::user()) logout2xButton @endif" aria-labelledby="navbarDropdownMenuLink1">
                             <div class="d-flex justify-content-between align-items-center mb-2" style="padding: 5px;">
                                 <input type="number" class="form-control w-60" placeholder="calorii" id="minicalcCalories">
                                 <span class="minicalcCaloriesResult ms-2 fw-bold">0</span>
