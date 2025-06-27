@@ -8,7 +8,8 @@
     <title>Caltrack</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://bootswatch.com/5/brite/bootstrap.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap4.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap4.min.css">
     <link href="{{ asset('fontawesome-free-6.7.2-web/css/fontawesome.css') }}" rel="stylesheet">
     <link href="{{ asset('fontawesome-free-6.7.2-web/css/solid.css') }}" rel="stylesheet">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
@@ -17,45 +18,76 @@
 
 <body>
     <nav class="navbar mainnav navbar-expand-lg navbar-light" style="background-color: rgb(104, 211, 145);">
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-    <div class="collapse navbar-collapse justify-content-between" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-            @if (Auth::user())
-            <li class="nav-item active">
-                <a class="nav-link" href="{{ route('food-entries.index') }}" role="button"> 🍗 Jurnal</a>
-            </li>
-            @endif
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('food-items.index') }}" role="button"> 📋 Catalog</a>
-            </li>
-            @if (Auth::user())
-            <li class="nav-item disabled">
-                <a class="nav-link" href="#" role="button"> 🏋️‍♀️ Exerciții</a>
-            </li>
-            <li class="nav-item disabled">
-                <a class="nav-link" href="#" role="button"> 📆 Calendar</a>
-            </li>
-            @endif
-        </ul>
-            @if (Auth::user())
-            <span class="navbar-text dropdown" style="margin-right: 20px;">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown"
-                    aria-haspopup="true" aria-expanded="false">
-                        @if (Auth::user()->name == 'Călina')👩🏻‍💻 @else 👱🏼‍♂️ @endif{{ Auth::user()->name }}
-                </a>
-                <div class="dropdown-menu logoutButton" aria-labelledby="navbarDropdownMenuLink">
-                    <a class="dropdown-item" href="{{ route('logout') }}"
-                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Deconectare</a>
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                        @csrf
-                    </form>
+        <div class="collapse navbar-collapse justify-content-between" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                @if (Auth::user())
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{{ route('food-entries.index') }}" role="button"> 🍗 Jurnal</a>
+                    </li>
+                @endif
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('food-items.index') }}" role="button"> 📋 Catalog</a>
+                </li>
+                @if (Auth::user())
+                    <li class="nav-item disabled">
+                        <a class="nav-link" href="#" role="button"> 🏋️‍♀️ Exerciții</a>
+                    </li>
+                    <li class="nav-item disabled">
+                        <a class="nav-link" href="#" role="button"> 📆 Calendar</a>
+                    </li>
+                @endif
+            </ul>
+            <span class="navbar-text" style="margin-right: 20px;">
+                <div class="row">
+                    <div class="col dropdown">
+                        <a class="col nav-link" href="#" id="navbarDropdownMenuLink1" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa-solid fa-calculator"></i>
+                        </a>
+                        <div class="dropdown-menu logoutButton" aria-labelledby="navbarDropdownMenuLink1">
+                            <div class="d-flex justify-content-between align-items-center mb-2" style="padding: 5px;">
+                                <input type="number" class="form-control w-60" placeholder="calorii" id="minicalcCalories">
+                                <span class="minicalcCaloriesResult ms-2 fw-bold">0</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2" style="padding: 5px;">
+                                <input type="number" class="form-control w-60" step="0.01" placeholder="proteine"
+                                    id="minicalcProteins">
+                                <span class="minicalcProteinsResult ms-2 fw-bold">0</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center" style="padding: 5px;">
+                                <input type="number" class="form-control w-60" step="0.01" placeholder="multiplier"
+                                    id="minicalcMul">
+                            </div>
+
+                        </div>
+                    </div>
+                    @if (Auth::user())
+                    <div class="col dropdown">
+                        <a class="col nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink"
+                            role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @if (Auth::user()->name == 'Călina')
+                                👩🏻‍💻
+                            @else
+                                👱🏼‍♂️
+                            @endif{{ Auth::user()->name }}
+                        </a>
+                        <div class="dropdown-menu logoutButton" aria-labelledby="navbarDropdownMenuLink">
+                            <a class="dropdown-item" href="{{ route('logout') }}"
+                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Deconectare</a>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                @csrf
+                            </form>
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </span>
-            @endif
-    </div>
+        </div>
     </nav>
 
     <div class="event-schedule-area-two bg-color pad100">
@@ -74,6 +106,14 @@
 
 
     <script type="text/javascript">
+        $("miniCalcCalories, #minicalcProteins, #minicalcMul").on("input", function() {
+            let calories = parseFloat($("#minicalcCalories").val()) || 0;
+            let proteins = parseFloat($("#minicalcProteins").val()) || 0;
+            let multiplier = parseFloat($("#minicalcMul").val()) || 1;
+
+            $(".minicalcCaloriesResult").text((calories * multiplier).toFixed(0));
+            $(".minicalcProteinsResult").text((proteins * multiplier).toFixed(2));
+        });
         @yield('scripts')
     </script>
 </body>
