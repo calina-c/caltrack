@@ -351,7 +351,7 @@
         </div>
         <div class="form-row entryFormRow">
             <div class="col-md-6 pull-left">
-                <input type="number" step="0.1" placeholder="fracție" class="form-control @if ($errors->has('multiplier')) is-invalid @endif " name="multiplier" value="{{ old('multiplier') ?: 1 }}" required>
+                <input type="number" step="0.01" placeholder="fracție" class="form-control @if ($errors->has('multiplier')) is-invalid @endif " name="multiplier" value="{{ old('multiplier') ?: 1 }}" required>
             </div>
             <div class="col">
                 <span class="the-unit" style="font-size:22px; vertical-align:middle; padding-left:10px"> x </span>
