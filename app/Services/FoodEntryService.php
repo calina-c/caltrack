@@ -55,6 +55,7 @@ class FoodEntryService
                 'ceașcă' => 'cești',
                 'felie' => 'felii',
                 'porție' => 'porții',
+                'cupă' => 'cupe',
                 'lingură' => 'linguri',
                 'buc' => 'buc',
                 'pumn' => 'pumni',
