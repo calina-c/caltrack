@@ -4,7 +4,7 @@
     @foreach ($notifications as $notification)
     <div class="alert alert-info justify-content-between">
         <span>{{ $notification->description }}</span>
-        <a type="button" class="btn slimbtn" href="{{ route('food-entries.index', json_decode($notification->data, true)["date"] ) }}">
+        <a type="button" class="btn slimbtn" href="{{ route('food-entries.index', ['date' => json_decode($notification->data, true)["date"]] ) }}">
             mergi la zi
         </a>
         <a type="button" class="btn close slimbtn" aria-label="Close" href="{{ route('notification.read', $notification->id) }}">
