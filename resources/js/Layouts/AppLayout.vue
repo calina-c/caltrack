@@ -52,19 +52,8 @@
                         </div>
                     </div>
 
-                    <!-- Right side: Calculator + User -->
+                    <!-- Right side: User -->
                     <div class="flex items-center space-x-4">
-                        <!-- Calculator Button -->
-                        <div class="relative">
-                            <button
-                                @click="showCalculator = !showCalculator"
-                                class="p-2 text-slate-500 hover:text-slate-700 hover:bg-white/60 rounded-lg transition-all duration-200"
-                            >
-                                <i class="fa fa-calculator"></i>
-                            </button>
-                            <!-- Calculator dropdown stays the same -->
-                        </div>
-
                         <!-- User Info -->
                         <div
                             class="flex items-center space-x-3 bg-white/60 rounded-lg px-3 py-2 shadow-sm"
@@ -144,26 +133,7 @@ import { Link, router, usePage } from "@inertiajs/vue3";
 const page = usePage();
 const currentPage = computed(() => page);
 
-const showCalculator = ref(false);
 const showMobileMenu = ref(false);
-
-const calculator = ref({
-    calories: 0,
-    protein: 0,
-    multiplier: 1,
-});
-
-const calculatedCalories = computed(() => {
-    return (
-        (calculator.value.calories || 0) * (calculator.value.multiplier || 1)
-    ).toFixed(0);
-});
-
-const calculatedProtein = computed(() => {
-    return (
-        (calculator.value.protein || 0) * (calculator.value.multiplier || 1)
-    ).toFixed(2);
-});
 
 // Flash messages
 const flashSuccess = computed(() => page.props?.flash?.success);
@@ -182,12 +152,4 @@ const getUserIcon = computed(() => {
 const logout = () => {
     router.post("/logout");
 };
-
-// Close dropdowns when clicking outside
-document.addEventListener("click", (e) => {
-    if (!e.target.closest(".relative")) {
-        showCalculator.value = false;
-        showMobileMenu.value = false;
-    }
-});
 </script>

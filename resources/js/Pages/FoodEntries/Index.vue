@@ -1,4 +1,4 @@
-<!-- resources/js/Pages/FoodEntries/Index.vue - Updated with inline totals -->
+<!-- resources/js/Pages/FoodEntries/Index.vue - Complete file with dual-mode entry -->
 <template>
     <AppLayout>
         <!-- Notifications -->
@@ -32,7 +32,7 @@
         </div>
         <!-- Day Header -->
         <div
-            class="group relative overflow-hidden bg-gradient-to-br from-white via-gray-50 to-emerald-50 text-emerald-800 rounded-2xl shadow-lg border border-emerald-200/50 px-6 py-4 text-center transform hover:scale-105 transition-all duration-300 hover:shadow-xl"
+            class="group relative overflow-hidden bg-gradient-to-br from-white via-gray-50 to-emerald-50 text-emerald-800 rounded-2xl shadow-lg border border-emerald-200/50 px-6 py-4 text-center transition-all duration-300 hover:shadow-xl"
         >
             <div
                 class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -198,7 +198,7 @@
                                 <td
                                     class="px-4 py-4 whitespace-nowrap text-sm text-gray-900"
                                 >
-                                    {{ parseFloat(entry.protein).toFixed(2) }}
+                                    {{ formatNumber(entry.protein, 2) }}
                                 </td>
                                 <td
                                     class="px-4 py-4 whitespace-nowrap text-center"
@@ -354,7 +354,7 @@
                             >
                             <span
                                 ><strong>{{
-                                    parseFloat(entry.protein).toFixed(2)
+                                    formatNumber(entry.protein, 2)
                                 }}</strong
                                 >g proteine</span
                             >
@@ -593,9 +593,9 @@
                                     <div class="min-w-0 flex-1">
                                         <div class="font-bold text-sm truncate">
                                             {{
-                                                parseFloat(
+                                                formatNumber(
                                                     selectedDay.sumProtein,
-                                                ).toFixed(1)
+                                                )
                                             }}g protein
                                         </div>
                                         <div
@@ -607,9 +607,9 @@
                                                     ? ""
                                                     : "+"
                                             }}{{
-                                                (
-                                                    90 - selectedDay.sumProtein
-                                                ).toFixed(1)
+                                                formatNumber(
+                                                    90 - selectedDay.sumProtein,
+                                                )
                                             }}g din 90g
                                         </div>
                                         <div
@@ -965,14 +965,14 @@
             </div>
         </div>
 
-        <!-- Add Food Entry Modal -->
+        <!-- Add Food Entry Modal with Dual Mode -->
         <div
             v-if="showAddModal"
             class="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center p-4"
             @click="showAddModal = false"
         >
             <div
-                class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md"
+                class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto"
                 @click.stop
             >
                 <div class="flex justify-between items-center mb-6">
@@ -987,12 +987,14 @@
                     </button>
                 </div>
 
-                <form @submit.prevent="addFoodEntry" class="space-y-4">
+                <form @submit.prevent="addFoodEntry" class="space-y-6">
+                    <!-- Time field -->
                     <div>
                         <label
                             class="block text-sm font-medium text-gray-700 mb-2"
-                            >Ora</label
                         >
+                            Ora
+                        </label>
                         <input
                             v-model="entryForm.time"
                             type="time"
@@ -1001,57 +1003,336 @@
                         />
                     </div>
 
-                    <div>
-                        <label
-                            class="block text-sm font-medium text-gray-700 mb-2"
-                            >Nume aliment</label
+                    <!-- Entry type tabs -->
+                    <div class="border-b border-gray-200">
+                        <nav class="flex space-x-8" aria-label="Tabs">
+                            <button
+                                type="button"
+                                @click="entryMode = 'catalog'"
+                                :class="[
+                                    'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm',
+                                    entryMode === 'catalog'
+                                        ? 'border-green-500 text-green-600'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+                                ]"
+                            >
+                                Din catalog
+                            </button>
+                            <button
+                                type="button"
+                                @click="entryMode = 'direct'"
+                                :class="[
+                                    'whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm',
+                                    entryMode === 'direct'
+                                        ? 'border-green-500 text-green-600'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
+                                ]"
+                            >
+                                Direct
+                            </button>
+                        </nav>
+                    </div>
+
+                    <!-- Catalog mode -->
+                    <div v-if="entryMode === 'catalog'" class="space-y-4">
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-gray-700 mb-2"
+                            >
+                                Aliment din catalog
+                            </label>
+                            <div class="relative food-dropdown-container">
+                                <input
+                                    v-model="foodSearchTerm"
+                                    @focus="showFoodDropdown = true"
+                                    @input="showFoodDropdown = true"
+                                    type="text"
+                                    :placeholder="
+                                        selectedFoodItem
+                                            ? `${selectedFoodItem.name}${selectedFoodItem.brand ? ` (${selectedFoodItem.brand})` : ''}`
+                                            : 'Caută aliment...'
+                                    "
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
+                                    :class="{ 'bg-gray-50': selectedFoodItem }"
+                                    autocomplete="off"
+                                />
+
+                                <!-- Dropdown -->
+                                <div
+                                    v-if="
+                                        showFoodDropdown &&
+                                        filteredFoodItems.length > 0
+                                    "
+                                    class="absolute z-20 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto"
+                                >
+                                    <div
+                                        v-for="foodItem in filteredFoodItems.slice(
+                                            0,
+                                            10,
+                                        )"
+                                        :key="foodItem.id"
+                                        @click="selectFoodItem(foodItem)"
+                                        class="px-4 py-3 hover:bg-green-50 cursor-pointer flex items-start justify-between transition-colors duration-150 border-b border-gray-100 last:border-b-0"
+                                    >
+                                        <div class="flex-1 min-w-0">
+                                            <div
+                                                class="font-medium text-gray-900 truncate"
+                                            >
+                                                {{ foodItem.name }}
+                                            </div>
+                                            <div
+                                                v-if="foodItem.brand"
+                                                class="text-sm text-gray-500 truncate"
+                                            >
+                                                {{ foodItem.brand }}
+                                            </div>
+                                            <div
+                                                class="text-xs text-gray-400 mt-1"
+                                            >
+                                                {{
+                                                    Math.round(
+                                                        foodItem.kcal || 0,
+                                                    )
+                                                }}
+                                                kcal,
+                                                {{
+                                                    formatNumber(
+                                                        foodItem.protein,
+                                                    )
+                                                }}g protein
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="ml-3 text-xs text-green-600 font-medium whitespace-nowrap"
+                                        >
+                                            {{
+                                                foodItem.unit_base_quantity == 1
+                                                    ? foodItem.unit_name
+                                                    : `${formatNumber(foodItem.unit_base_quantity)} ${foodItem.unit_name}`
+                                            }}
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        v-if="filteredFoodItems.length > 10"
+                                        class="px-4 py-2 text-xs text-gray-500 bg-gray-50 border-t"
+                                    >
+                                        {{ filteredFoodItems.length - 10 }} mai
+                                        multe rezultate...
+                                    </div>
+                                </div>
+
+                                <!-- Clear button -->
+                                <button
+                                    v-if="selectedFoodItem"
+                                    @click="clearFoodSelection"
+                                    type="button"
+                                    class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+                                >
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div
+                            v-if="selectedFoodItem"
+                            class="flex items-center space-x-4"
                         >
+                            <div class="flex-1">
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-2"
+                                >
+                                    Cantitate
+                                </label>
+                                <input
+                                    v-model="entryForm.multiplier"
+                                    type="number"
+                                    step="0.01"
+                                    min="0.01"
+                                    placeholder="1"
+                                    :required="entryMode === 'catalog'"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
+                                />
+                            </div>
+                            <div
+                                class="flex items-center text-xl text-gray-600 mt-6"
+                            >
+                                ×
+                            </div>
+                            <div class="flex-1">
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-2"
+                                >
+                                    Unitate
+                                </label>
+                                <div
+                                    class="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600"
+                                >
+                                    {{ unitDisplay }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Preview of calculated values -->
+                        <div
+                            v-if="selectedFoodItem && entryForm.multiplier"
+                            class="bg-green-50 border border-green-200 rounded-lg p-4"
+                        >
+                            <div
+                                class="text-sm font-medium text-green-800 mb-2"
+                            >
+                                Previzualizare:
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <span class="text-green-600">Calorii:</span>
+                                    {{
+                                        Math.round(
+                                            (selectedFoodItem.kcal || 0) *
+                                                (entryForm.multiplier || 1),
+                                        )
+                                    }}
+                                    kcal
+                                </div>
+                                <div>
+                                    <span class="text-green-600"
+                                        >Proteine:</span
+                                    >
+                                    {{
+                                        formatNumber(
+                                            parseFloat(
+                                                selectedFoodItem.protein || 0,
+                                            ) * (entryForm.multiplier || 1),
+                                            2,
+                                        )
+                                    }}g
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Direct mode -->
+                    <div v-if="entryMode === 'direct'" class="space-y-4">
+                        <!-- Hidden inputs for form submission -->
+                        <input type="hidden" v-model="entryForm.direct_kcal" />
                         <input
-                            v-model="entryForm.direct_name"
-                            type="text"
-                            required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
-                            placeholder="ex: Piept de pui"
+                            type="hidden"
+                            v-model="entryForm.direct_protein"
                         />
-                    </div>
 
-                    <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label
                                 class="block text-sm font-medium text-gray-700 mb-2"
-                                >Calorii</label
                             >
+                                Nume aliment
+                            </label>
                             <input
-                                v-model="entryForm.direct_kcal"
-                                type="number"
-                                min="0"
-                                required
+                                v-model="entryForm.direct_name"
+                                type="text"
+                                :required="entryMode === 'direct'"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
-                                placeholder="250"
+                                placeholder="ex: Piept de pui"
                             />
                         </div>
-                        <div>
-                            <label
-                                class="block text-sm font-medium text-gray-700 mb-2"
-                                >Proteine</label
+
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-2"
+                                >
+                                    Calorii per unitate
+                                </label>
+                                <input
+                                    v-model="directCaloriesPerUnit"
+                                    type="number"
+                                    min="0"
+                                    :required="entryMode === 'direct'"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
+                                    placeholder="250"
+                                />
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-2"
+                                >
+                                    Proteine per unitate
+                                </label>
+                                <input
+                                    v-model="directProteinPerUnit"
+                                    type="number"
+                                    step="0.1"
+                                    min="0"
+                                    :required="entryMode === 'direct'"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
+                                    placeholder="25.5"
+                                />
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-2"
+                                >
+                                    Cantitate
+                                </label>
+                                <input
+                                    v-model="directMultiplier"
+                                    type="number"
+                                    step="0.01"
+                                    min="0.01"
+                                    :required="entryMode === 'direct'"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
+                                    placeholder="1"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- Preview of calculated values -->
+                        <div
+                            v-if="
+                                directCaloriesPerUnit &&
+                                directProteinPerUnit &&
+                                directMultiplier
+                            "
+                            class="bg-green-50 border border-green-200 rounded-lg p-4"
+                        >
+                            <div
+                                class="text-sm font-medium text-green-800 mb-2"
                             >
-                            <input
-                                v-model="entryForm.direct_protein"
-                                type="number"
-                                step="0.1"
-                                min="0"
-                                required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
-                                placeholder="25.5"
-                            />
+                                Previzualizare:
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <span class="text-green-600">Calorii:</span>
+                                    {{
+                                        Math.round(
+                                            (directCaloriesPerUnit || 0) *
+                                                (directMultiplier || 1),
+                                        )
+                                    }}
+                                    kcal
+                                </div>
+                                <div>
+                                    <span class="text-green-600"
+                                        >Proteine:</span
+                                    >
+                                    {{
+                                        formatNumber(
+                                            (directProteinPerUnit || 0) *
+                                                (directMultiplier || 1),
+                                            2,
+                                        )
+                                    }}g
+                                </div>
+                            </div>
                         </div>
                     </div>
 
+                    <!-- Description field (common for both modes) -->
                     <div>
                         <label
                             class="block text-sm font-medium text-gray-700 mb-2"
-                            >Descriere (opțional)</label
                         >
+                            Descriere (opțional)
+                        </label>
                         <input
                             v-model="entryForm.description"
                             type="text"
@@ -1071,7 +1352,7 @@
                         <button
                             type="submit"
                             :disabled="entryForm.processing"
-                            class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+                            class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <span v-if="entryForm.processing"
                                 >Se adaugă...</span
@@ -1197,7 +1478,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, nextTick } from "vue";
 import { router, useForm } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 
@@ -1220,6 +1501,12 @@ const props = defineProps({
 const selectedDayIndex = ref(0);
 const showAddModal = ref(false);
 const showExerciseModal = ref(false);
+const entryMode = ref("catalog"); // 'catalog' or 'direct'
+const selectedFoodItem = ref(null);
+const showExerciseDropdown = ref(false);
+const selectedExerciseType = ref(null);
+const foodSearchTerm = ref("");
+const showFoodDropdown = ref(false);
 
 // Computed
 const selectedDay = computed(() => {
@@ -1256,6 +1543,29 @@ const isCurrentWeek = computed(() => {
 
     const pageStartDate = new Date(props.startDate);
     return pageStartDate >= startOfWeek && pageStartDate <= endOfWeek;
+});
+
+const unitDisplay = computed(() => {
+    if (!selectedFoodItem.value) return "";
+
+    const unitName = selectedFoodItem.value.unit_name || "";
+    const baseQty = selectedFoodItem.value.unit_base_quantity || 1;
+
+    if (baseQty == 1) {
+        return unitName;
+    }
+    return `${baseQty} ${unitName}`;
+});
+
+const filteredFoodItems = computed(() => {
+    if (!foodSearchTerm.value) return props.foodItems || [];
+
+    const searchLower = foodSearchTerm.value.toLowerCase();
+    return (props.foodItems || []).filter(
+        (item) =>
+            item.name.toLowerCase().includes(searchLower) ||
+            (item.brand && item.brand.toLowerCase().includes(searchLower)),
+    );
 });
 
 const ratingOptions = [
@@ -1305,9 +1615,14 @@ const entryForm = useForm({
         hour: "2-digit",
         minute: "2-digit",
     }),
+    // Catalog mode fields
+    food_item_id: "",
+    multiplier: 1,
+    // Direct mode fields
     direct_name: "",
     direct_kcal: "",
     direct_protein: "",
+    // Common fields
     description: "",
     date: "",
 });
@@ -1330,6 +1645,62 @@ watch(
     },
     { immediate: true },
 );
+
+// Watch for entry mode changes to clear opposing fields
+watch(entryMode, (newMode) => {
+    if (newMode === "catalog") {
+        // Clear direct mode fields
+        entryForm.direct_name = "";
+        entryForm.direct_kcal = "";
+        entryForm.direct_protein = "";
+    } else {
+        // Clear catalog mode fields
+        entryForm.food_item_id = "";
+        entryForm.multiplier = 1;
+        selectedFoodItem.value = null;
+        foodSearchTerm.value = "";
+        showFoodDropdown.value = false;
+    }
+});
+
+// Watch for modal changes to reset form
+watch(showAddModal, (newValue) => {
+    if (newValue) {
+        resetEntryForm();
+    }
+});
+
+// Click outside handler for food dropdown
+const handleClickOutside = (event) => {
+    // Check if click is outside the dropdown but inside the modal
+    const isInsideDropdown = event.target.closest(".food-dropdown-container");
+    const isInsideModal = event.target.closest(".bg-white.rounded-2xl"); // The modal content
+
+    if (!isInsideDropdown && isInsideModal) {
+        showFoodDropdown.value = false;
+        // If nothing is selected, clear the search term
+        if (!selectedFoodItem.value) {
+            foodSearchTerm.value = "";
+        }
+    }
+};
+
+// Add click outside listener when dropdown is shown
+watch(showFoodDropdown, (isOpen) => {
+    if (isOpen) {
+        nextTick(() => {
+            const modal = document.querySelector(".bg-white.rounded-2xl");
+            if (modal) {
+                modal.addEventListener("click", handleClickOutside);
+            }
+        });
+    } else {
+        const modal = document.querySelector(".bg-white.rounded-2xl");
+        if (modal) {
+            modal.removeEventListener("click", handleClickOutside);
+        }
+    }
+});
 
 // Methods
 const selectDay = (dayData, index) => {
@@ -1427,22 +1798,113 @@ const getRatingEmoji = (rating) => {
     return option ? `${option.emoji} ${option.label}` : "";
 };
 
+// Utility function to format numbers nicely (remove unnecessary decimals)
+const formatNumber = (value, decimals = 1) => {
+    const num = parseFloat(value || 0);
+    const formatted = num.toFixed(decimals);
+    // Remove trailing zeros and decimal point if not needed
+    return formatted.replace(/\.?0+$/, "");
+};
+
+// Method to handle food item selection
+const selectFoodItem = (foodItem) => {
+    selectedFoodItem.value = foodItem;
+    entryForm.food_item_id = foodItem.id;
+    foodSearchTerm.value = "";
+    showFoodDropdown.value = false;
+
+    // Clear direct fields when using catalog
+    entryForm.direct_name = "";
+    entryForm.direct_kcal = "";
+    entryForm.direct_protein = "";
+};
+
+const clearFoodSelection = () => {
+    selectedFoodItem.value = null;
+    entryForm.food_item_id = "";
+    foodSearchTerm.value = "";
+    showFoodDropdown.value = false;
+};
+
+const directCaloriesPerUnit = ref("");
+const directProteinPerUnit = ref("");
+const directMultiplier = ref(1);
+
+// Helper method to reset the form
+const resetEntryForm = () => {
+    entryForm.reset();
+    entryForm.time = new Date().toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+    entryForm.multiplier = 1;
+    // Set the date from the currently selected day
+    if (selectedDay.value) {
+        const dateStr = new Date(selectedDay.value.date)
+            .toISOString()
+            .split("T")[0];
+        entryForm.date = dateStr;
+        exerciseForm.date = dateStr; // Also set exercise form date
+    }
+    entryMode.value = "catalog";
+    selectedFoodItem.value = null;
+    foodSearchTerm.value = "";
+    showFoodDropdown.value = false;
+    // Reset direct mode variables
+    directCaloriesPerUnit.value = "";
+    directProteinPerUnit.value = "";
+    directMultiplier.value = 1;
+};
+
 // Actions
 const addFoodEntry = () => {
+    // Prevent double submission
+    if (entryForm.processing) return;
+
+    // Validate catalog mode
+    if (entryMode.value === "catalog") {
+        if (!entryForm.food_item_id || !selectedFoodItem.value) {
+            alert("Te rog selectează un aliment din catalog.");
+            return;
+        }
+        // Clear direct fields when using catalog
+        entryForm.direct_name = "";
+        entryForm.direct_kcal = "";
+        entryForm.direct_protein = "";
+    } else {
+        // Validate direct mode
+        if (
+            !entryForm.direct_name ||
+            !directCaloriesPerUnit.value ||
+            !directProteinPerUnit.value ||
+            !directMultiplier.value
+        ) {
+            alert(
+                "Te rog completează toate câmpurile pentru intrarea directă.",
+            );
+            return;
+        }
+        // Calculate totals and set hidden fields
+        entryForm.direct_kcal = Math.round(
+            (directCaloriesPerUnit.value || 0) * (directMultiplier.value || 1),
+        );
+        entryForm.direct_protein =
+            (directProteinPerUnit.value || 0) * (directMultiplier.value || 1);
+        // Clear catalog fields when using direct
+        entryForm.food_item_id = null;
+        entryForm.multiplier = 1;
+    }
+
     entryForm.post(route("food-entries.store"), {
         onSuccess: () => {
             showAddModal.value = false;
-            entryForm.reset();
-            entryForm.time = new Date().toLocaleTimeString("en-GB", {
-                hour: "2-digit",
-                minute: "2-digit",
-            });
+            resetEntryForm();
+        },
+        onError: (errors) => {
+            console.error("Form submission errors:", errors);
         },
     });
 };
-
-const showExerciseDropdown = ref(false);
-const selectedExerciseType = ref(null);
 
 const selectExerciseType = (exerciseType) => {
     selectedExerciseType.value = exerciseType;
@@ -1450,13 +1912,12 @@ const selectExerciseType = (exerciseType) => {
     showExerciseDropdown.value = false;
 };
 
-// Also update the addExercise method to reset the selected type
 const addExercise = () => {
     exerciseForm.post(route("exercises.store"), {
         onSuccess: () => {
             showExerciseModal.value = false;
             exerciseForm.reset();
-            selectedExerciseType.value = null; // Reset the selected exercise type
+            selectedExerciseType.value = null;
         },
     });
 };
