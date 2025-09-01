@@ -1731,7 +1731,7 @@ const formatDateLong = (dateStr) => {
 };
 
 const formatTime = (dateString) => {
-    return new Date(dateString).toLocaleTimeString("ro-RO", {
+    return new Date(dateString).toLocaleTimeString("en-GB", {
         hour: "2-digit",
         minute: "2-digit",
     });
