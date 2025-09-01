@@ -1614,6 +1614,7 @@ const entryForm = useForm({
     time: new Date().toLocaleTimeString("en-GB", {
         hour: "2-digit",
         minute: "2-digit",
+        timeZone: "UTC",
     }),
     // Catalog mode fields
     food_item_id: "",
@@ -1734,6 +1735,7 @@ const formatTime = (dateString) => {
     return new Date(dateString).toLocaleTimeString("en-GB", {
         hour: "2-digit",
         minute: "2-digit",
+        timeZone: "UTC",
     });
 };
 
@@ -1836,6 +1838,7 @@ const resetEntryForm = () => {
     entryForm.time = new Date().toLocaleTimeString("en-GB", {
         hour: "2-digit",
         minute: "2-digit",
+        timeZone: "UTC",
     });
     entryForm.multiplier = 1;
     // Set the date from the currently selected day
