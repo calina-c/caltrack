@@ -1106,25 +1106,54 @@
                 </div>
 
                 <form @submit.prevent="addExercise" class="space-y-4">
+                    <!-- Custom Exercise Type Dropdown -->
                     <div>
                         <label
                             class="block text-sm font-medium text-gray-700 mb-2"
                             >Tip exercițiu</label
                         >
-                        <select
-                            v-model="exerciseForm.exercise_type_id"
-                            required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
-                        >
-                            <option value="">Selectează tipul</option>
-                            <option
-                                v-for="exerciseType in exerciseTypes"
-                                :key="exerciseType.id"
-                                :value="exerciseType.id"
+                        <div class="relative">
+                            <button
+                                type="button"
+                                @click="
+                                    showExerciseDropdown = !showExerciseDropdown
+                                "
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200 text-left flex items-center justify-between bg-white"
                             >
-                                {{ exerciseType.name }}
-                            </option>
-                        </select>
+                                <span
+                                    v-if="selectedExerciseType"
+                                    class="flex items-center space-x-2"
+                                >
+                                    <i
+                                        :class="`fa fa-${selectedExerciseType.icon} text-gray-600`"
+                                    ></i>
+                                    <span>{{ selectedExerciseType.name }}</span>
+                                </span>
+                                <span v-else class="text-gray-400"
+                                    >Selectează tipul</span
+                                >
+                                <i
+                                    :class="`fa fa-chevron-${showExerciseDropdown ? 'up' : 'down'} text-gray-400 transition-transform`"
+                                ></i>
+                            </button>
+
+                            <div
+                                v-if="showExerciseDropdown"
+                                class="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto"
+                            >
+                                <div
+                                    v-for="exerciseType in exerciseTypes"
+                                    :key="exerciseType.id"
+                                    @click="selectExerciseType(exerciseType)"
+                                    class="px-4 py-3 hover:bg-gray-100 cursor-pointer flex items-center space-x-3 transition-colors duration-150"
+                                >
+                                    <i
+                                        :class="`fa fa-${exerciseType.icon} text-gray-600 w-4`"
+                                    ></i>
+                                    <span>{{ exerciseType.name }}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div>
@@ -1135,7 +1164,6 @@
                         <input
                             v-model="exerciseForm.label"
                             type="text"
-                            required
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
                             placeholder="Scurtă descriere"
                         />
@@ -1151,8 +1179,10 @@
                         </button>
                         <button
                             type="submit"
-                            :disabled="exerciseForm.processing"
-                            class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+                            :disabled="
+                                exerciseForm.processing || !selectedExerciseType
+                            "
+                            class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <span v-if="exerciseForm.processing"
                                 >Se adaugă...</span
@@ -1411,11 +1441,22 @@ const addFoodEntry = () => {
     });
 };
 
+const showExerciseDropdown = ref(false);
+const selectedExerciseType = ref(null);
+
+const selectExerciseType = (exerciseType) => {
+    selectedExerciseType.value = exerciseType;
+    exerciseForm.exercise_type_id = exerciseType.id;
+    showExerciseDropdown.value = false;
+};
+
+// Also update the addExercise method to reset the selected type
 const addExercise = () => {
     exerciseForm.post(route("exercises.store"), {
         onSuccess: () => {
             showExerciseModal.value = false;
             exerciseForm.reset();
+            selectedExerciseType.value = null; // Reset the selected exercise type
         },
     });
 };
