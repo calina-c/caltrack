@@ -38,122 +38,214 @@
                 </div>
             </div>
 
-            <!-- Add new item form (for Călina only) -->
-            <div v-if="canAddItems" class="card p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                    Adaugă aliment nou
-                </h3>
-                <form @submit.prevent="addFoodItem" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label
-                                class="block text-sm font-medium text-gray-700 mb-2"
+            <!-- Collapsible Add Form -->
+            <div
+                v-if="canAddItems"
+                class="bg-white border border-gray-200 rounded-lg shadow-sm"
+            >
+                <!-- Accordion Header -->
+                <button
+                    @click="showForm = !showForm"
+                    class="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                >
+                    <div class="flex items-center">
+                        <div
+                            class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center mr-4"
+                        >
+                            <svg
+                                class="w-5 h-5 text-emerald-600"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
                             >
-                                Nume *
-                            </label>
-                            <input
-                                v-model="itemForm.name"
-                                type="text"
-                                required
-                                class="input-field"
-                                placeholder="ex: Piept de pui"
-                            />
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                                />
+                            </svg>
                         </div>
-                        <div>
-                            <label
-                                class="block text-sm font-medium text-gray-700 mb-2"
-                            >
-                                Brand
-                            </label>
-                            <input
-                                v-model="itemForm.brand"
-                                type="text"
-                                class="input-field"
-                                placeholder="ex: Carrefour"
-                            />
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label
-                                class="block text-sm font-medium text-gray-700 mb-2"
-                            >
-                                Cantitate de bază *
-                            </label>
-                            <input
-                                v-model="itemForm.unit_base_quantity"
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                required
-                                class="input-field"
-                                placeholder="ex: 100"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                class="block text-sm font-medium text-gray-700 mb-2"
-                            >
-                                Unitate de măsură *
-                            </label>
-                            <input
-                                v-model="itemForm.unit_name"
-                                type="text"
-                                required
-                                class="input-field"
-                                placeholder="ex: g, ceașcă, felie"
-                            />
-                        </div>
-                        <div>
-                            <label
-                                class="block text-sm font-medium text-gray-700 mb-2"
-                            >
-                                Calorii (per unitate) *
-                            </label>
-                            <input
-                                v-model="itemForm.kcal"
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                required
-                                class="input-field"
-                                placeholder="ex: 165"
-                            />
+                        <div class="text-left">
+                            <h3 class="text-lg font-semibold text-gray-900">
+                                Adaugă aliment nou
+                            </h3>
+                            <p class="text-sm text-gray-500">
+                                Click pentru a deschide formularul
+                            </p>
                         </div>
                     </div>
+                    <svg
+                        :class="[
+                            'w-5 h-5 text-gray-400 transition-transform duration-300',
+                            showForm ? 'rotate-180' : '',
+                        ]"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 9l-7 7-7-7"
+                        />
+                    </svg>
+                </button>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label
-                                class="block text-sm font-medium text-gray-700 mb-2"
-                            >
-                                Proteine (per unitate) *
-                            </label>
-                            <input
-                                v-model="itemForm.protein"
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                required
-                                class="input-field"
-                                placeholder="ex: 31"
-                            />
+                <!-- Accordion Content -->
+                <div
+                    v-show="showForm"
+                    class="border-t border-gray-200 p-6 bg-gray-50"
+                >
+                    <form @submit.prevent="submitForm" class="space-y-6">
+                        <!-- Name & Brand Row -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-2"
+                                >
+                                    Nume aliment *
+                                </label>
+                                <input
+                                    v-model="itemForm.name"
+                                    type="text"
+                                    required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white"
+                                    placeholder="ex: Piept de pui"
+                                />
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-2"
+                                >
+                                    Brand (opțional)
+                                </label>
+                                <input
+                                    v-model="itemForm.brand"
+                                    type="text"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white"
+                                    placeholder="ex: Carrefour"
+                                />
+                            </div>
                         </div>
-                        <div class="flex items-end">
+
+                        <!-- Quantity & Unit Row -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-2"
+                                >
+                                    Cantitate de bază *
+                                </label>
+                                <input
+                                    v-model="itemForm.unit_base_quantity"
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white"
+                                    placeholder="100"
+                                />
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-2"
+                                >
+                                    Unitate de măsură *
+                                </label>
+                                <input
+                                    v-model="itemForm.unit_name"
+                                    type="text"
+                                    required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white"
+                                    placeholder="g, ml, bucată"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- Calories & Protein Row -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-2"
+                                >
+                                    Calorii (kcal) *
+                                </label>
+                                <input
+                                    v-model="itemForm.kcal"
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white"
+                                    placeholder="165"
+                                />
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-sm font-medium text-gray-700 mb-2"
+                                >
+                                    Proteine (g) *
+                                </label>
+                                <input
+                                    v-model="itemForm.protein"
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white"
+                                    placeholder="31.5"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div
+                            class="flex justify-end space-x-3 pt-4 border-t border-gray-200"
+                        >
+                            <button
+                                type="button"
+                                @click="showForm = false"
+                                class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+                            >
+                                Anulează
+                            </button>
                             <button
                                 type="submit"
                                 :disabled="itemForm.processing"
-                                class="btn-primary"
+                                class="px-8 py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-medium rounded-lg hover:from-emerald-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
                             >
-                                <span v-if="itemForm.processing"
-                                    >Se adaugă...</span
+                                <span
+                                    v-if="itemForm.processing"
+                                    class="flex items-center"
                                 >
-                                <span v-else>Adaugă aliment</span>
+                                    <svg
+                                        class="w-4 h-4 animate-spin mr-2"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            class="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            stroke-width="4"
+                                        ></circle>
+                                        <path
+                                            class="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        ></path>
+                                    </svg>
+                                    Se salvează...
+                                </span>
+                                <span v-else>Salvează alimentul</span>
                             </button>
                         </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
 
             <!-- Food items table -->
@@ -250,48 +342,54 @@
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-center"
                                 >
-                                    <button
-                                        v-if="
-                                            item.entries_count === 0 &&
-                                            canDeleteItems
-                                        "
-                                        @click="deleteItem(item.id)"
-                                        class="text-red-400 hover:text-red-600 transition-colors"
-                                        title="Șterge alimentul"
+                                    <!-- Both icons use the exact same wrapper structure -->
+                                    <div
+                                        class="inline-flex items-center justify-center w-8 h-8"
                                     >
-                                        <svg
-                                            class="h-5 w-5"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
+                                        <button
+                                            v-if="
+                                                item.entries_count === 0 &&
+                                                canDeleteItems
+                                            "
+                                            @click="deleteItem(item.id)"
+                                            type="button"
+                                            class="inline-flex items-center justify-center w-8 h-8 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                            title="Șterge alimentul"
                                         >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                            />
-                                        </svg>
-                                    </button>
-                                    <span
-                                        v-else-if="item.entries_count > 0"
-                                        class="text-gray-400"
-                                        title="Nu se poate șterge - are intrări asociate"
-                                    >
-                                        <svg
-                                            class="h-5 w-5"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
+                                            <svg
+                                                class="h-5 w-5"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                                />
+                                            </svg>
+                                        </button>
+                                        <div
+                                            v-else-if="item.entries_count > 0"
+                                            class="inline-flex items-center justify-center w-8 h-8 text-gray-400"
+                                            title="Nu se poate șterge - are intrări asociate"
                                         >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                                            />
-                                        </svg>
-                                    </span>
+                                            <svg
+                                                class="h-5 w-5"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                                                />
+                                            </svg>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
@@ -336,16 +434,18 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 const props = defineProps({
     foodItems: Array,
     search: String,
+    auth: Object,
 });
 
 const searchQuery = ref(props.search || "");
+const showForm = ref(false);
 
 const canAddItems = computed(() => {
-    return window.Laravel?.user?.name === "Călina";
+    return props.auth?.user?.name === "Călina";
 });
 
 const canDeleteItems = computed(() => {
-    return window.Laravel?.user?.name === "Călina";
+    return props.auth?.user?.name === "Călina";
 });
 
 const itemForm = useForm({
@@ -369,10 +469,11 @@ const searchFoodItems = () => {
     );
 };
 
-const addFoodItem = () => {
+const submitForm = () => {
     itemForm.post(route("food-items.store"), {
         onSuccess: () => {
             itemForm.reset();
+            showForm.value = false;
         },
     });
 };
