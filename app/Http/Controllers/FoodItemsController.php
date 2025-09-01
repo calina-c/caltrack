@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Services\FoodEntryService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class FoodItemsController extends Controller
 {
@@ -27,7 +29,7 @@ class FoodItemsController extends Controller
             'unit_base_quantity'
         );
 
-        return view('food_items', [
+        return Inertia::render('FoodItems/Index', [
             'foodItems' => $foodItems,
         ]);
     }

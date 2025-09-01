@@ -9,6 +9,8 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class FoodEntriesController extends Controller
 {
@@ -64,7 +66,7 @@ class FoodEntriesController extends Controller
             ->orderBy('date', 'asc')
             ->first();
 
-        return view('food_entries', [
+        return Inertia::render('FoodEntries/Index', [
             'foodEntries' => $allWeekDates,
             'foodItems' => \App\Models\FoodItem::orderBy('name')->get(),
             'startDate' => $startDate,
