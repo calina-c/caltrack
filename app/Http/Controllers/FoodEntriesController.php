@@ -53,7 +53,7 @@ class FoodEntriesController extends Controller
                 'goals' => \App\Models\Goal::where([
                     'date' => $currentDate->format('Y-m-d'),
                 ])->get()->keyBy('goal_type_id'),
-                'exercises' => \App\Models\Exercise::where([
+                'exercises' => \App\Models\Exercise::with("exerciseType")->where([
                     'date' => $currentDate->format('Y-m-d'),
                 ])->get(),
             ]);

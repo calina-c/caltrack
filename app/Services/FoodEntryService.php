@@ -10,6 +10,7 @@ class FoodEntryService
     public function getGroupedFoodEntries($startDate = null, $endDate = null)
     {
         $foodEntries = \App\Models\FoodEntry::leftJoin('food_items', 'food_entries.food_item_id', '=', 'food_items.id')
+            ->with('thumbs')
             ->selectRaw(
                 'food_entries.id, '.
                 'food_entries.description, '.
@@ -29,6 +30,7 @@ class FoodEntryService
         $foodEntries = $foodEntries->map(function ($entry) {
             $entry->ate_at = Carbon::parse($entry->ate_at);
             $entry->ate_at_date = $entry->ate_at->format('Y-m-d');
+            $entry->hasThumbs = $entry->thumbs || ($entry->food_item_id && $entry->thumbs);
 
             return $entry;
         });

@@ -1,83 +1,107 @@
-<!-- resources/js/Pages/FoodEntries/Index.vue - FINAL CLEAN VERSION -->
+<!-- resources/js/Pages/FoodEntries/Index.vue - Updated with inline totals -->
 <template>
     <AppLayout>
+        <!-- Notifications -->
+        <div
+            v-if="notifications && notifications.length > 0"
+            class="mb-6 space-y-2"
+        >
+            <div
+                v-for="notification in notifications"
+                :key="notification.id"
+                class="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between"
+            >
+                <span class="text-blue-800">{{
+                    notification.description
+                }}</span>
+                <div class="flex space-x-2">
+                    <button
+                        @click="goToNotificationDate(notification)"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
+                    >
+                        Mergi la zi
+                    </button>
+                    <button
+                        @click="markNotificationRead(notification.id)"
+                        class="text-blue-600 hover:text-blue-800"
+                    >
+                        ×
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Day Header -->
+        <div
+            class="group relative overflow-hidden bg-gradient-to-br from-white via-gray-50 to-emerald-50 text-emerald-800 rounded-2xl shadow-lg border border-emerald-200/50 px-6 py-4 text-center transform hover:scale-105 transition-all duration-300 hover:shadow-xl"
+        >
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            ></div>
+            <div
+                class="absolute -right-2 -top-2 w-12 h-12 bg-emerald-500/20 rounded-full"
+            ></div>
+            <div
+                class="absolute -left-1 -bottom-1 w-6 h-6 bg-emerald-500/10 rounded-full"
+            ></div>
+            <h2 class="relative text-2xl font-bold">
+                {{ selectedDay.dayNameHuman }} -
+                {{ formatDateLong(selectedDay.date) }}
+            </h2>
+        </div>
+
         <!-- Week Navigation -->
         <div class="mb-8">
-            <div class="flex overflow-x-auto space-x-2 pb-4">
-                <button
-                    v-for="(dayData, index) in foodEntries"
-                    :key="index"
-                    @click="selectDay(dayData, index)"
-                    :class="[
-                        'flex-shrink-0 px-4 py-3 rounded-xl text-center transition-all duration-200 min-w-[100px]',
-                        selectedDayIndex === index
-                            ? 'bg-green-500 text-white shadow-lg transform scale-105'
-                            : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md hover:shadow-lg',
-                    ]"
-                >
-                    <div class="font-semibold">{{ dayData.dayNameHuman }}</div>
-                    <div class="text-xs opacity-75">
-                        {{ formatDateShort(dayData.date) }}
-                    </div>
-                </button>
+            <div class="p-4 w-full">
+                <div class="grid grid-cols-7 gap-2">
+                    <button
+                        v-for="(dayData, index) in foodEntries"
+                        :key="index"
+                        @click="selectDay(dayData, index)"
+                        :class="[
+                            'px-2 md:px-4 py-3 rounded-xl text-center transition-all duration-200 min-w-0',
+                            selectedDayIndex === index
+                                ? 'bg-emerald-500 text-white shadow-lg transform scale-105'
+                                : 'bg-white/70 backdrop-blur-sm text-gray-700 hover:bg-white/90 shadow-md hover:shadow-lg border border-white/20',
+                        ]"
+                    >
+                        <!-- Mobile: Show only first letter + day -->
+                        <div class="md:hidden">
+                            <div class="font-semibold text-xs">
+                                {{ dayData.dayNameHuman.charAt(0) }}
+                            </div>
+                            <div class="text-xs opacity-75">
+                                {{
+                                    formatDateShort(dayData.date).split(" ")[0]
+                                }}
+                            </div>
+                        </div>
+                        <!-- Desktop: Show full name + day -->
+                        <div class="hidden md:block">
+                            <div class="font-semibold">
+                                {{ dayData.dayNameHuman }}
+                            </div>
+                            <div class="text-xs opacity-75">
+                                {{ formatDateShort(dayData.date) }}
+                            </div>
+                        </div>
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- Selected Day Content -->
         <div v-if="selectedDay" class="space-y-6">
-            <!-- Day Header -->
-            <div class="text-center">
-                <h2 class="text-2xl font-bold text-gray-900 mb-2">
-                    {{ selectedDay.dayNameHuman }} -
-                    {{ formatDateLong(selectedDay.date) }}
-                </h2>
-            </div>
-
-            <!-- Goals Section -->
-            <div
-                v-if="goalTypes && goalTypes.length > 0"
-                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-            >
-                <div
-                    v-for="goalType in goalTypes"
-                    :key="goalType.id"
-                    class="bg-white rounded-xl shadow-lg border border-gray-100 p-4"
-                >
-                    <div class="flex items-center justify-between mb-2">
-                        <h4 class="font-semibold text-gray-900">
-                            {{ goalType.name }}
-                        </h4>
-                        <button
-                            v-if="canEdit && !selectedDay.dayObject"
-                            @click="updateGoal(goalType.id)"
-                            class="text-green-600 hover:text-green-700 text-xl font-bold"
-                        >
-                            +
-                        </button>
-                    </div>
-
-                    <div class="text-sm text-gray-600 mb-3">
-                        {{ getGoalProgress(goalType.id) }} /
-                        {{ goalType.target_qty }}
-                    </div>
-
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                            class="bg-green-500 h-2 rounded-full transition-all duration-300"
-                            :style="{
-                                width: `${getGoalProgressPercentage(goalType.id)}%`,
-                            }"
-                        ></div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Food Entries -->
             <div
                 class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden"
             >
-                <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900">
+                <div
+                    class="bg-gradient-to-r from-emerald-100 via-teal-50 to-green-100 px-6 py-4 border-b border-gray-200"
+                >
+                    <h3
+                        class="text-lg font-bold text-gray-800 flex items-center"
+                    >
+                        <i class="fa fa-utensils mr-3 text-emerald-600"></i>
                         Intrări alimentare
                     </h3>
                 </div>
@@ -179,19 +203,61 @@
                                 <td
                                     class="px-4 py-4 whitespace-nowrap text-center"
                                 >
-                                    <button
-                                        v-if="canEdit && !selectedDay.dayObject"
-                                        @click="deleteEntry(entry.id)"
-                                        class="text-red-400 hover:text-red-600 transition-colors p-1"
-                                    >
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                    <span
-                                        v-else-if="canEdit"
-                                        class="text-gray-400"
-                                    >
-                                        <i class="fa fa-lock"></i>
-                                    </span>
+                                    <!-- Actions for Călina -->
+                                    <div v-if="isCalina">
+                                        <button
+                                            v-if="!selectedDay.dayObject"
+                                            @click="deleteEntry(entry.id)"
+                                            class="text-red-400 hover:text-red-600 transition-colors p-1"
+                                        >
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                        <span v-else class="text-gray-400">
+                                            <i class="fa fa-lock"></i>
+                                        </span>
+                                    </div>
+                                    <!-- Actions for others (thumbs up/down) -->
+                                    <div v-else>
+                                        <div
+                                            v-if="!entry.hasThumbs"
+                                            class="flex space-x-1 justify-center"
+                                        >
+                                            <button
+                                                @click="
+                                                    addThumb(
+                                                        entry.id,
+                                                        entry.food_item_id,
+                                                        'up',
+                                                    )
+                                                "
+                                                class="text-green-500 hover:text-green-600 p-1"
+                                                title="Thumbs up"
+                                            >
+                                                <i class="fa fa-thumbs-up"></i>
+                                            </button>
+                                            <button
+                                                @click="
+                                                    addThumb(
+                                                        entry.id,
+                                                        entry.food_item_id,
+                                                        'down',
+                                                    )
+                                                "
+                                                class="text-red-500 hover:text-red-600 p-1"
+                                                title="Thumbs down"
+                                            >
+                                                <i
+                                                    class="fa fa-thumbs-down"
+                                                ></i>
+                                            </button>
+                                        </div>
+                                        <div
+                                            v-else
+                                            class="text-xs text-gray-400"
+                                        >
+                                            Evaluat
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
@@ -229,13 +295,51 @@
                                     <span v-html="entry.qtyForHumans"></span>
                                 </div>
                             </div>
-                            <button
-                                v-if="canEdit && !selectedDay.dayObject"
-                                @click="deleteEntry(entry.id)"
-                                class="text-red-400 hover:text-red-600 p-1"
-                            >
-                                <i class="fa fa-trash"></i>
-                            </button>
+                            <div v-if="isCalina">
+                                <button
+                                    v-if="!selectedDay.dayObject"
+                                    @click="deleteEntry(entry.id)"
+                                    class="text-red-400 hover:text-red-600 p-1"
+                                >
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                            <div v-else>
+                                <div
+                                    v-if="!entry.hasThumbs"
+                                    class="flex space-x-1"
+                                >
+                                    <button
+                                        @click="
+                                            addThumb(
+                                                entry.id,
+                                                entry.food_item_id,
+                                                'up',
+                                            )
+                                        "
+                                        class="text-green-500 hover:text-green-600 p-1"
+                                        title="Thumbs up"
+                                    >
+                                        <i class="fa fa-thumbs-up"></i>
+                                    </button>
+                                    <button
+                                        @click="
+                                            addThumb(
+                                                entry.id,
+                                                entry.food_item_id,
+                                                'down',
+                                            )
+                                        "
+                                        class="text-red-500 hover:text-red-600 p-1"
+                                        title="Thumbs down"
+                                    >
+                                        <i class="fa fa-thumbs-down"></i>
+                                    </button>
+                                </div>
+                                <div v-else class="text-xs text-gray-400">
+                                    Evaluat
+                                </div>
+                            </div>
                         </div>
                         <div
                             v-if="entry.description"
@@ -258,62 +362,597 @@
                     </div>
                 </div>
 
-                <!-- Totals Footer -->
-                <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
-                    <div
-                        class="flex justify-between items-center flex-wrap gap-4"
+                <!-- Add Entry Button -->
+                <div
+                    v-if="canEdit && !selectedDay.dayObject"
+                    class="p-6 border-t border-gray-200"
+                >
+                    <button
+                        @click="showAddModal = true"
+                        class="w-full bg-emerald-100 hover:bg-emerald-200 font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
                     >
-                        <div class="flex items-center space-x-4">
-                            <span class="font-semibold text-gray-900"
-                                >Total:</span
-                            >
-                            <span
-                                :class="[
-                                    'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium',
-                                    getKcalClass(selectedDay.sumKcal),
-                                ]"
-                            >
-                                {{ selectedDay.sumKcal }} kcal
-                            </span>
-                            <span
-                                :class="[
-                                    'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium',
-                                    getProteinClass(selectedDay.sumProtein),
-                                ]"
-                            >
-                                {{
-                                    parseFloat(selectedDay.sumProtein).toFixed(
-                                        1,
-                                    )
-                                }}g proteine
-                            </span>
-                        </div>
-                        <button
-                            v-if="canEdit && !selectedDay.dayObject"
-                            @click="showAddModal = true"
-                            class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
-                        >
-                            <i class="fa fa-plus mr-2"></i> Adaugă
-                        </button>
-                    </div>
+                        <i class="fa fa-plus mr-2"></i> Adaugă intrare
+                        alimentară
+                    </button>
                 </div>
             </div>
 
-            <!-- Add Entry Button (Mobile) -->
+            <!-- Exercises, Goals, and Daily Summary Combined Section -->
             <div
-                v-if="canEdit && !selectedDay.dayObject"
-                class="md:hidden text-center"
+                class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden"
             >
-                <button
-                    @click="showAddModal = true"
-                    class="bg-green-600 hover:bg-green-700 text-white font-semibold text-lg px-8 py-4 rounded-lg w-full transition-colors duration-200"
+                <div
+                    class="bg-gradient-to-r from-emerald-100 via-teal-50 to-green-100 px-6 py-4 border-b border-gray-200"
                 >
-                    <i class="fa fa-plus mr-2"></i> Adaugă intrare
+                    <h3
+                        class="text-lg font-bold text-gray-800 flex items-center"
+                    >
+                        <i class="fa fa-dumbbell mr-3 text-emerald-600"></i>
+                        Exerciții și obiective
+                    </h3>
+                </div>
+
+                <div class="p-6 space-y-6">
+                    <!-- Goals -->
+                    <div
+                        v-if="goalTypes && goalTypes.length > 0"
+                        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"
+                    >
+                        <div
+                            v-for="goalType in goalTypes"
+                            :key="goalType.id"
+                            class="group relative overflow-hidden bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 rounded-xl border border-emerald-100 p-4 hover:shadow-lg transition-all duration-300 hover:scale-105"
+                        >
+                            <!-- Background decoration -->
+                            <div
+                                class="absolute -top-2 -right-2 w-12 h-12 bg-emerald-200/20 rounded-full"
+                            ></div>
+                            <div
+                                class="absolute -bottom-1 -left-1 w-6 h-6 bg-emerald-300/30 rounded-full"
+                            ></div>
+
+                            <div
+                                class="relative flex items-center justify-between"
+                            >
+                                <div class="flex-1">
+                                    <h4
+                                        class="font-semibold text-gray-800 text-sm mb-1"
+                                    >
+                                        {{ goalType.name }}
+                                    </h4>
+
+                                    <!-- Cool fraction display -->
+                                    <div class="flex items-baseline space-x-1">
+                                        <span
+                                            class="text-2xl font-bold tabular-nums transition-all duration-300"
+                                            :class="
+                                                getGoalProgress(goalType.id) >=
+                                                goalType.target_qty
+                                                    ? 'text-emerald-600'
+                                                    : 'text-gray-700'
+                                            "
+                                        >
+                                            {{ getGoalProgress(goalType.id) }}
+                                        </span>
+                                        <span
+                                            class="text-gray-400 text-lg font-light"
+                                            >/</span
+                                        >
+                                        <span
+                                            class="text-lg font-medium text-gray-600 tabular-nums"
+                                        >
+                                            {{ goalType.target_qty }}
+                                        </span>
+
+                                        <!-- Goal completion indicator -->
+                                        <div
+                                            v-if="
+                                                getGoalProgress(goalType.id) >=
+                                                goalType.target_qty
+                                            "
+                                            class="ml-2"
+                                        >
+                                            <div
+                                                class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"
+                                            ></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Action button with enhanced styling -->
+                                <button
+                                    v-if="canEdit && !selectedDay.dayObject"
+                                    @click="updateGoal(goalType.id)"
+                                    class="group/btn relative overflow-hidden bg-emerald-500 hover:bg-emerald-600 text-white w-8 h-8 rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-110 flex items-center justify-center"
+                                >
+                                    <div
+                                        class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover/btn:opacity-100 transition-opacity duration-200"
+                                    ></div>
+                                    <span class="relative text-sm font-bold"
+                                        >+</span
+                                    >
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Totals and Exercises -->
+                    <div>
+                        <div class="flex flex-wrap gap-4">
+                            <!-- Calories Card -->
+                            <div
+                                :class="[
+                                    'group relative overflow-hidden text-white rounded-2xl px-6 py-4 shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-xl flex-1 min-w-0',
+                                    getKcalClass(selectedDay.sumKcal).includes(
+                                        'green',
+                                    )
+                                        ? 'bg-gradient-to-br from-green-400 via-green-500 to-emerald-500'
+                                        : getKcalClass(
+                                                selectedDay.sumKcal,
+                                            ).includes('blue')
+                                          ? 'bg-gradient-to-br from-blue-400 via-blue-500 to-indigo-500'
+                                          : getKcalClass(
+                                                  selectedDay.sumKcal,
+                                              ).includes('yellow')
+                                            ? 'bg-gradient-to-br from-yellow-400 via-yellow-500 to-orange-500'
+                                            : 'bg-gradient-to-br from-red-400 via-red-500 to-red-600',
+                                ]"
+                            >
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                ></div>
+                                <div
+                                    class="relative flex items-center space-x-3"
+                                >
+                                    <div
+                                        class="bg-white/20 rounded-full p-2 flex-shrink-0"
+                                    >
+                                        <svg
+                                            class="w-6 h-6 text-white"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.5-7 2 0 5.5 1.5 5.5 4 0 0 0 1 0 1h4.036z"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="font-bold text-sm truncate">
+                                            {{ selectedDay.sumKcal }} kcal
+                                        </div>
+                                        <div
+                                            v-if="isCalina"
+                                            class="text-xs text-white/80 opacity-90 truncate"
+                                        >
+                                            {{
+                                                1300 - selectedDay.sumKcal >= 0
+                                                    ? "+"
+                                                    : ""
+                                            }}{{ 1300 - selectedDay.sumKcal }}
+                                            din 1300
+                                        </div>
+                                        <div
+                                            v-else
+                                            class="text-xs text-white/80 opacity-90 truncate"
+                                        >
+                                            Calorii totale
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    class="absolute -right-2 -top-2 w-8 h-8 bg-white/10 rounded-full"
+                                ></div>
+                                <div
+                                    class="absolute -left-1 -bottom-1 w-4 h-4 bg-white/5 rounded-full"
+                                ></div>
+                            </div>
+
+                            <!-- Protein Card -->
+                            <div
+                                :class="[
+                                    'group relative overflow-hidden text-white rounded-2xl px-6 py-4 shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-xl flex-1 min-w-0',
+                                    getProteinClass(
+                                        selectedDay.sumProtein,
+                                    ).includes('green')
+                                        ? 'bg-gradient-to-br from-green-400 via-green-500 to-emerald-500'
+                                        : getProteinClass(
+                                                selectedDay.sumProtein,
+                                            ).includes('yellow')
+                                          ? 'bg-gradient-to-br from-yellow-400 via-yellow-500 to-orange-500'
+                                          : 'bg-gradient-to-br from-red-400 via-red-500 to-red-600',
+                                ]"
+                            >
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                ></div>
+                                <div
+                                    class="relative flex items-center space-x-3"
+                                >
+                                    <div
+                                        class="bg-white/20 rounded-full p-2 flex-shrink-0"
+                                    >
+                                        <svg
+                                            class="w-6 h-6 text-white"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="font-bold text-sm truncate">
+                                            {{
+                                                parseFloat(
+                                                    selectedDay.sumProtein,
+                                                ).toFixed(1)
+                                            }}g protein
+                                        </div>
+                                        <div
+                                            v-if="isCalina"
+                                            class="text-xs text-white/80 opacity-90 truncate"
+                                        >
+                                            {{
+                                                90 - selectedDay.sumProtein <= 0
+                                                    ? ""
+                                                    : "+"
+                                            }}{{
+                                                (
+                                                    90 - selectedDay.sumProtein
+                                                ).toFixed(1)
+                                            }}g din 90g
+                                        </div>
+                                        <div
+                                            v-else
+                                            class="text-xs text-white/80 opacity-90 truncate"
+                                        >
+                                            Proteine totale
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    class="absolute -right-2 -top-2 w-8 h-8 bg-white/10 rounded-full"
+                                ></div>
+                                <div
+                                    class="absolute -left-1 -bottom-1 w-4 h-4 bg-white/5 rounded-full"
+                                ></div>
+                            </div>
+
+                            <!-- Exercise Badges -->
+                            <div
+                                v-for="exercise in selectedDay.exercises"
+                                :key="exercise.id"
+                                class="group relative overflow-hidden bg-gradient-to-br from-emerald-400 via-emerald-500 to-emerald-600 text-white rounded-2xl px-6 py-4 shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-xl flex-1 min-w-0"
+                            >
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                ></div>
+                                <div
+                                    class="relative flex items-center space-x-3"
+                                >
+                                    <div
+                                        class="bg-white/20 rounded-full p-2 flex-shrink-0"
+                                    >
+                                        <i
+                                            :class="`fa fa-lg fa-${exercise.exercise_type.icon} text-white`"
+                                        ></i>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="font-bold text-sm truncate">
+                                            {{ exercise.exercise_type.name }}
+                                        </div>
+                                        <div
+                                            class="text-xs text-emerald-50 opacity-90 truncate"
+                                        >
+                                            {{ exercise.label }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    class="absolute -right-2 -top-2 w-8 h-8 bg-emerald-300/30 rounded-full"
+                                ></div>
+                                <div
+                                    class="absolute -left-1 -bottom-1 w-4 h-4 bg-emerald-300/20 rounded-full"
+                                ></div>
+                            </div>
+
+                            <!-- Add Exercise Badge -->
+                            <button
+                                v-if="canEdit && !selectedDay.dayObject"
+                                @click="showExerciseModal = true"
+                                class="group relative overflow-hidden bg-gradient-to-br from-white via-gray-50 to-emerald-50 text-emerald-700 rounded-2xl px-6 py-4 shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-xl border border-emerald-200/50 flex-1 min-w-0"
+                            >
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                ></div>
+                                <div
+                                    class="relative flex items-center space-x-3"
+                                >
+                                    <div
+                                        class="bg-emerald-500/20 rounded-full p-2 flex-shrink-0"
+                                    >
+                                        <i
+                                            class="fa fa-lg fa-plus text-emerald-600"
+                                        ></i>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="font-bold text-sm truncate">
+                                            Adaugă exercițiu
+                                        </div>
+                                        <div
+                                            class="text-xs text-emerald-600/70 opacity-90 truncate"
+                                        >
+                                            Nou
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    class="absolute -right-2 -top-2 w-8 h-8 bg-emerald-500/20 rounded-full"
+                                ></div>
+                                <div
+                                    class="absolute -left-1 -bottom-1 w-4 h-4 bg-emerald-500/10 rounded-full"
+                                ></div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Day Actions -->
+                    <div class="border-t border-gray-200 pt-6">
+                        <div v-if="isCalina" class="text-center">
+                            <button
+                                v-if="!selectedDay.dayObject"
+                                @click="closeDay()"
+                                class="w-full bg-emerald-100 hover:bg-emerald-200 font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
+                            >
+                                <i class="fa fa-lock mr-2"></i> Închide ziua
+                            </button>
+                            <div
+                                v-else-if="
+                                    selectedDay.dayObject &&
+                                    selectedDay.dayObject.rating
+                                "
+                                class="text-center"
+                            >
+                                <div class="text-sm text-gray-600 mb-2">
+                                    Rating primit:
+                                </div>
+                                <div class="text-lg font-semibold">
+                                    {{
+                                        getRatingEmoji(
+                                            selectedDay.dayObject.rating,
+                                        )
+                                    }}
+                                </div>
+                            </div>
+                            <div v-else class="text-gray-600">
+                                <i class="fa fa-check-circle mr-2"></i>Ziua este
+                                închisă
+                            </div>
+                        </div>
+
+                        <div v-else>
+                            <!-- Rating section for non-Călina users -->
+                            <div v-if="selectedDay.dayObject">
+                                <div v-if="selectedDay.dayObject.done">
+                                    <div
+                                        v-if="selectedDay.dayObject.rating"
+                                        class="text-center"
+                                    >
+                                        <div class="text-sm text-gray-600 mb-2">
+                                            Rating acordat:
+                                        </div>
+                                        <div class="text-lg font-semibold">
+                                            {{
+                                                getRatingEmoji(
+                                                    selectedDay.dayObject
+                                                        .rating,
+                                                )
+                                            }}
+                                        </div>
+                                    </div>
+                                    <div v-else class="text-center">
+                                        <div
+                                            class="text-sm font-medium text-gray-700 mb-4"
+                                        >
+                                            Acordă un rating pentru această zi:
+                                        </div>
+                                        <div
+                                            class="flex flex-wrap gap-2 justify-center"
+                                        >
+                                            <button
+                                                v-for="(
+                                                    rating, index
+                                                ) in ratingOptions"
+                                                :key="index"
+                                                @click="addRating(rating.value)"
+                                                :class="[
+                                                    'text-sm px-4 py-2 rounded-lg font-medium transition-all duration-200 transform hover:scale-105',
+                                                    rating.class,
+                                                ]"
+                                            >
+                                                {{ rating.emoji }}
+                                                {{ rating.label }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-else class="text-center text-gray-600">
+                                    <i class="fa fa-clock mr-2"></i>Ziua nu e
+                                    gata încă. Ratingul mai trebuie să aștepte.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Week Navigation Footer -->
+        <div class="mt-12 -mx-4 sm:-mx-6 lg:-mx-8 p-6">
+            <div class="flex flex-wrap gap-3 items-center justify-between">
+                <!-- Special Buttons -->
+                <button
+                    v-if="!isCalina && lastUnreviewedDate"
+                    @click="goToDate(lastUnreviewedDate)"
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center space-x-2"
+                >
+                    <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 616 0z"
+                        ></path>
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                        ></path>
+                    </svg>
+                    <span>Ultima nevăzută</span>
+                </button>
+
+                <!-- Navigation Controls - Now stretched to fill middle space -->
+                <div
+                    class="flex items-center space-x-2 bg-gray-50/80 backdrop-blur-sm rounded-xl p-2 flex-1 mx-4 min-w-0 border border-gray-200/50"
+                >
+                    <button
+                        @click="goToPreviousWeek"
+                        class="bg-white/70 hover:bg-white/90 text-gray-600 font-bold px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200/50 backdrop-blur-sm"
+                        title="Săptămâna precedentă"
+                    >
+                        <svg
+                            class="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
+                            ></path>
+                        </svg>
+                    </button>
+                    <button
+                        @click="goToPreviousDay"
+                        class="bg-white/70 hover:bg-white/90 text-gray-600 font-bold px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200/50 backdrop-blur-sm"
+                        title="Ziua precedentă"
+                    >
+                        <svg
+                            class="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M15 19l-7-7 7-7"
+                            ></path>
+                        </svg>
+                    </button>
+
+                    <div
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100/80 rounded-lg flex-1 text-center min-w-0 backdrop-blur-sm"
+                    >
+                        {{ formatDateRange() }}
+                    </div>
+
+                    <button
+                        @click="goToNextDay"
+                        class="bg-white/70 hover:bg-white/90 text-gray-600 font-bold px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200/50 backdrop-blur-sm"
+                        title="Ziua următoare"
+                    >
+                        <svg
+                            class="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 5l7 7-7 7"
+                            ></path>
+                        </svg>
+                    </button>
+                    <button
+                        @click="goToNextWeek"
+                        class="bg-white/70 hover:bg-white/90 text-gray-600 font-bold px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200/50 backdrop-blur-sm"
+                        title="Săptămâna următoare"
+                    >
+                        <svg
+                            class="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M13 5l7 7-7 7M5 5l7 7-7 7"
+                            ></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Current Week Button -->
+                <button
+                    @click="goToCurrentWeek"
+                    :class="[
+                        'font-semibold px-6 py-3 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center space-x-2 flex-shrink-0',
+                        isCurrentWeek
+                            ? 'bg-emerald-700 hover:bg-emerald-800 text-white'
+                            : 'bg-emerald-600 hover:bg-emerald-700 text-white',
+                    ]"
+                >
+                    <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        ></path>
+                    </svg>
+                    <span>{{
+                        isCurrentWeek ? "Săptămâna curentă" : "Săptămâna asta"
+                    }}</span>
+                    <span
+                        v-if="isCurrentWeek"
+                        class="bg-white bg-opacity-20 px-2 py-1 rounded-full text-xs"
+                        >Aici</span
+                    >
                 </button>
             </div>
         </div>
 
-        <!-- Add Modal -->
+        <!-- Add Food Entry Modal -->
         <div
             v-if="showAddModal"
             class="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center p-4"
@@ -430,11 +1069,92 @@
                 </form>
             </div>
         </div>
+
+        <!-- Add Exercise Modal -->
+        <div
+            v-if="showExerciseModal"
+            class="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center p-4"
+            @click="showExerciseModal = false"
+        >
+            <div
+                class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md"
+                @click.stop
+            >
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">
+                        Adaugă exercițiu
+                    </h3>
+                    <button
+                        @click="showExerciseModal = false"
+                        class="text-gray-400 hover:text-gray-500 p-1"
+                    >
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+
+                <form @submit.prevent="addExercise" class="space-y-4">
+                    <div>
+                        <label
+                            class="block text-sm font-medium text-gray-700 mb-2"
+                            >Tip exercițiu</label
+                        >
+                        <select
+                            v-model="exerciseForm.exercise_type_id"
+                            required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
+                        >
+                            <option value="">Selectează tipul</option>
+                            <option
+                                v-for="exerciseType in exerciseTypes"
+                                :key="exerciseType.id"
+                                :value="exerciseType.id"
+                            >
+                                {{ exerciseType.name }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label
+                            class="block text-sm font-medium text-gray-700 mb-2"
+                            >Etichetă</label
+                        >
+                        <input
+                            v-model="exerciseForm.label"
+                            type="text"
+                            required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
+                            placeholder="Scurtă descriere"
+                        />
+                    </div>
+
+                    <div class="flex justify-end space-x-3">
+                        <button
+                            type="button"
+                            @click="showExerciseModal = false"
+                            class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+                        >
+                            Renunță
+                        </button>
+                        <button
+                            type="submit"
+                            :disabled="exerciseForm.processing"
+                            class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+                        >
+                            <span v-if="exerciseForm.processing"
+                                >Se adaugă...</span
+                            >
+                            <span v-else>Adaugă exercițiu</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </AppLayout>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { router, useForm } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 
@@ -450,20 +1170,83 @@ const props = defineProps({
     lastUnreviewedDate: String,
     notifications: Array,
     roMonthNames: Object,
+    auth: Object,
 });
 
 // State
 const selectedDayIndex = ref(0);
 const showAddModal = ref(false);
+const showExerciseModal = ref(false);
 
 // Computed
 const selectedDay = computed(() => {
-    return props.foodEntries && props.foodEntries[selectedDayIndex.value]
-        ? props.foodEntries[selectedDayIndex.value]
-        : null;
+    if (!props.foodEntries || !props.foodEntries[selectedDayIndex.value]) {
+        return null;
+    }
+
+    // Get the base day data
+    const dayData = { ...props.foodEntries[selectedDayIndex.value] };
+
+    // The exercises should already be part of the day data from the backend
+    // but make sure the array exists
+    if (!dayData.exercises) {
+        dayData.exercises = [];
+    }
+
+    return dayData;
 });
 
-const canEdit = computed(() => true);
+const canEdit = computed(() => {
+    return props.auth?.user?.name === "Călina";
+});
+
+const isCalina = computed(() => {
+    return props.auth?.user?.name === "Călina";
+});
+
+const isCurrentWeek = computed(() => {
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay() + 1); // Monday
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6); // Sunday
+
+    const pageStartDate = new Date(props.startDate);
+    return pageStartDate >= startOfWeek && pageStartDate <= endOfWeek;
+});
+
+const ratingOptions = [
+    {
+        value: 1,
+        emoji: "😤",
+        label: "Jale extremală",
+        class: "bg-red-500 hover:bg-red-600 text-white",
+    },
+    {
+        value: 2,
+        emoji: "🥴",
+        label: "Nasol",
+        class: "bg-orange-500 hover:bg-orange-600 text-white",
+    },
+    {
+        value: 3,
+        emoji: "🤷‍♂️",
+        label: "Meh",
+        class: "bg-gray-500 hover:bg-gray-600 text-white",
+    },
+    {
+        value: 4,
+        emoji: "✅",
+        label: "OK",
+        class: "bg-blue-500 hover:bg-blue-600 text-white",
+    },
+    {
+        value: 5,
+        emoji: "🎉",
+        label: "Forță",
+        class: "bg-green-500 hover:bg-green-600 text-white",
+    },
+];
 
 // Initialize selected day
 if (props.foodEntries && props.foodEntries.length > 0) {
@@ -473,7 +1256,7 @@ if (props.foodEntries && props.foodEntries.length > 0) {
     selectedDayIndex.value = foundIndex >= 0 ? foundIndex : 0;
 }
 
-// Form
+// Forms
 const entryForm = useForm({
     time: new Date().toLocaleTimeString("en-GB", {
         hour: "2-digit",
@@ -483,8 +1266,27 @@ const entryForm = useForm({
     direct_kcal: "",
     direct_protein: "",
     description: "",
-    date: props.selectedDay.slice(0, 10),
+    date: "",
 });
+
+const exerciseForm = useForm({
+    exercise_type_id: "",
+    label: "",
+    date: "",
+});
+
+// Watch for selected day changes to update form dates
+watch(
+    selectedDay,
+    (newDay) => {
+        if (newDay) {
+            const dateStr = new Date(newDay.date).toISOString().split("T")[0];
+            entryForm.date = dateStr;
+            exerciseForm.date = dateStr;
+        }
+    },
+    { immediate: true },
+);
 
 // Methods
 const selectDay = (dayData, index) => {
@@ -521,6 +1323,25 @@ const formatTime = (dateString) => {
     });
 };
 
+const formatDateRange = () => {
+    const startDate = new Date(props.startDate);
+    // Calculate the end of a 7-day week from start date (6 days later)
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 6);
+
+    const startDay = startDate.getDate();
+    const endDay = endDate.getDate();
+    const startMonth =
+        props.roMonthNames[String(startDate.getMonth() + 1).padStart(2, "0")];
+    const endMonth =
+        props.roMonthNames[String(endDate.getMonth() + 1).padStart(2, "0")];
+
+    if (startMonth === endMonth) {
+        return `${startDay}-${endDay} ${startMonth}`;
+    }
+    return `${startDay} ${startMonth} - ${endDay} ${endMonth}`;
+};
+
 const getGoalProgress = (goalTypeId) => {
     return selectedDay.value?.goals?.[goalTypeId]?.qty || 0;
 };
@@ -546,39 +1367,136 @@ const getProteinClass = (protein) => {
     return "bg-red-100 text-red-800";
 };
 
+const getRemainingKcalClass = (remaining) => {
+    if (remaining >= 0) return "bg-green-100 text-green-800";
+    if (remaining >= -200) return "bg-yellow-100 text-yellow-800";
+    return "bg-red-100 text-red-800";
+};
+
+const getRemainingProteinClass = (remaining) => {
+    if (remaining <= 0) return "bg-green-100 text-green-800";
+    if (remaining <= 29) return "bg-yellow-100 text-yellow-800";
+    return "bg-red-100 text-red-800";
+};
+
+const getRatingEmoji = (rating) => {
+    const option = ratingOptions.find((r) => r.value === rating);
+    return option ? `${option.emoji} ${option.label}` : "";
+};
+
+// Actions
 const addFoodEntry = () => {
-    entryForm.post("/food-entries", {
+    entryForm.post(route("food-entries.store"), {
         onSuccess: () => {
             showAddModal.value = false;
             entryForm.reset();
-            router.reload();
+            entryForm.time = new Date().toLocaleTimeString("en-GB", {
+                hour: "2-digit",
+                minute: "2-digit",
+            });
+        },
+    });
+};
+
+const addExercise = () => {
+    exerciseForm.post(route("exercises.store"), {
+        onSuccess: () => {
+            showExerciseModal.value = false;
+            exerciseForm.reset();
         },
     });
 };
 
 const deleteEntry = (entryId) => {
     if (confirm("Sigur vrei să ștergi această intrare?")) {
-        router.delete(`/food-entries/${entryId}`, {
-            onSuccess: () => {
-                router.reload();
-            },
-        });
+        router.delete(route("food-entries.destroy", entryId));
     }
 };
 
 const updateGoal = (goalTypeId) => {
     const currentProgress = getGoalProgress(goalTypeId);
-    router.post(
-        `/goals/${goalTypeId}`,
-        {
-            date: props.selectedDay.slice(0, 10),
-            qty: currentProgress + 1,
-        },
-        {
-            onSuccess: () => {
-                router.reload();
-            },
-        },
-    );
+    router.post(route("goals.update", goalTypeId), {
+        date: new Date(selectedDay.value.date).toISOString().split("T")[0],
+        goal_type_id: goalTypeId,
+        qty: currentProgress + 1,
+    });
+};
+
+const addThumb = (entryId, foodItemId, type) => {
+    if (
+        confirm(
+            `Sigur vrei să dai ${type === "up" ? "thumbs up" : "thumbs down"}?`,
+        )
+    ) {
+        const url = foodItemId
+            ? route("thumbs.store", {
+                  food_entry_id: entryId,
+                  food_item_id: foodItemId,
+              })
+            : route("thumbs.store", { food_entry_id: entryId });
+
+        router.post(url, {
+            type: type,
+            date: new Date(selectedDay.value.date).toISOString().split("T")[0],
+        });
+    }
+};
+
+const closeDay = () => {
+    if (confirm("Sigur vrei să închizi această zi?")) {
+        router.post(route("days.store"), {
+            date: new Date(selectedDay.value.date).toISOString().split("T")[0],
+            done: 1,
+        });
+    }
+};
+
+const addRating = (rating) => {
+    router.post(route("days.update", selectedDay.value.dayObject.id), {
+        rating: rating,
+    });
+};
+
+// Navigation
+const goToDate = (date) => {
+    router.get(route("food-entries.index", { date: date }));
+};
+
+const goToPreviousWeek = () => {
+    const newDate = new Date(props.startDate);
+    newDate.setDate(newDate.getDate() - 7);
+    goToDate(newDate.toISOString().split("T")[0]);
+};
+
+const goToPreviousDay = () => {
+    const newDate = new Date(props.startDate);
+    newDate.setDate(newDate.getDate() - 1);
+    goToDate(newDate.toISOString().split("T")[0]);
+};
+
+const goToNextDay = () => {
+    const newDate = new Date(props.startDate);
+    newDate.setDate(newDate.getDate() + 7);
+    goToDate(newDate.toISOString().split("T")[0]);
+};
+
+const goToNextWeek = () => {
+    const newDate = new Date(props.startDate);
+    newDate.setDate(newDate.getDate() + 7);
+    goToDate(newDate.toISOString().split("T")[0]);
+};
+
+const goToCurrentWeek = () => {
+    const now = new Date();
+    goToDate(now.toISOString().split("T")[0]);
+};
+
+const goToNotificationDate = (notification) => {
+    const data = JSON.parse(notification.data);
+    goToDate(data.date);
+};
+
+const markNotificationRead = (notificationId) => {
+    router.get(route("notification.read", notificationId));
 };
 </script>
