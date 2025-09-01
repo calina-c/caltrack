@@ -17,12 +17,21 @@ class ExerciseController extends Controller
         ]);
 
         // Create a new exercise record
-        $exercise = new \App\Models\Exercise;
+        $exercise = new \App\Models\Exercise();
         $exercise->date = $request->input('date');
         $exercise->exercise_type_id = $request->input('exercise_type_id');
         $exercise->label = $request->input('label');
         $exercise->save();
 
         return redirect(route('food-entries.index', ['date' => $validatedData['date']]));
+    }
+
+    public function deleteExercise($id)
+    {
+        $exercise = \App\Models\Exercise::findOrFail($id);
+        $date = $exercise->date;
+        $exercise->delete();
+
+        return redirect(route('food-entries.index', ['date' => $date]));
     }
 }

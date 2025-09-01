@@ -478,11 +478,11 @@
 
                     <!-- Totals and Exercises -->
                     <div>
-                        <div class="flex flex-wrap gap-4">
+                        <div class="flex flex-col sm:flex-row flex-wrap gap-4">
                             <!-- Calories Card -->
                             <div
                                 :class="[
-                                    'group relative overflow-hidden text-white rounded-2xl px-6 py-4 shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-xl flex-1 min-w-0',
+                                    'group relative overflow-hidden text-white rounded-2xl px-6 py-4 shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-xl sm:flex-1 min-w-0',
                                     getKcalClass(selectedDay.sumKcal).includes(
                                         'green',
                                     )
@@ -555,7 +555,7 @@
                             <!-- Protein Card -->
                             <div
                                 :class="[
-                                    'group relative overflow-hidden text-white rounded-2xl px-6 py-4 shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-xl flex-1 min-w-0',
+                                    'group relative overflow-hidden text-white rounded-2xl px-6 py-4 shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-xl sm:flex-1 min-w-0',
                                     getProteinClass(
                                         selectedDay.sumProtein,
                                     ).includes('green')
@@ -632,11 +632,23 @@
                             <div
                                 v-for="exercise in selectedDay.exercises"
                                 :key="exercise.id"
-                                class="group relative overflow-hidden bg-gradient-to-br from-emerald-400 via-emerald-500 to-emerald-600 text-white rounded-2xl px-6 py-4 shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-xl flex-1 min-w-0"
+                                class="group relative overflow-hidden bg-gradient-to-br from-emerald-400 via-emerald-500 to-emerald-600 text-white rounded-2xl px-6 py-4 shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-xl sm:flex-1 min-w-0"
                             >
                                 <div
                                     class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                 ></div>
+
+                                <!-- Delete button -->
+                                <button
+                                    v-if="isCalina && !selectedDay.dayObject"
+                                    @click="deleteExercise(exercise.id)"
+                                    class="absolute top-2 right-2 w-6 h-6 bg-red-500/80 hover:bg-red-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 z-10"
+                                >
+                                    <i
+                                        class="fa fa-times text-white text-xs"
+                                    ></i>
+                                </button>
+
                                 <div
                                     class="relative flex items-center space-x-3"
                                 >
@@ -670,7 +682,7 @@
                             <button
                                 v-if="canEdit && !selectedDay.dayObject"
                                 @click="showExerciseModal = true"
-                                class="group relative overflow-hidden bg-gradient-to-br from-white via-gray-50 to-emerald-50 text-emerald-700 rounded-2xl px-6 py-4 shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-xl border border-emerald-200/50 flex-1 min-w-0"
+                                class="group relative overflow-hidden bg-gradient-to-br from-white via-gray-50 to-emerald-50 text-emerald-700 rounded-2xl px-6 py-4 shadow-lg transform hover:scale-105 transition-all duration-300 hover:shadow-xl border border-emerald-200/50 sm:flex-1 min-w-0"
                             >
                                 <div
                                     class="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -705,7 +717,6 @@
                             </button>
                         </div>
                     </div>
-
                     <!-- Day Actions -->
                     <div class="border-t border-gray-200 pt-6">
                         <div v-if="isCalina" class="text-center">
@@ -799,12 +810,14 @@
 
         <!-- Week Navigation Footer -->
         <div class="mt-12 -mx-4 sm:-mx-6 lg:-mx-8 p-6">
-            <div class="flex flex-wrap gap-3 items-center justify-between">
+            <div
+                class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center sm:justify-between"
+            >
                 <!-- Special Buttons -->
                 <button
                     v-if="!isCalina && lastUnreviewedDate"
                     @click="goToDate(lastUnreviewedDate)"
-                    class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center space-x-2"
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center justify-center space-x-2 order-3 sm:order-1"
                 >
                     <svg
                         class="w-4 h-4"
@@ -828,13 +841,13 @@
                     <span>Ultima nevăzută</span>
                 </button>
 
-                <!-- Navigation Controls - Now stretched to fill middle space -->
+                <!-- Navigation Controls -->
                 <div
-                    class="flex items-center space-x-2 bg-gray-50/80 backdrop-blur-sm rounded-xl p-2 flex-1 mx-4 min-w-0 border border-gray-200/50"
+                    class="flex items-center space-x-2 bg-gray-50/80 backdrop-blur-sm rounded-xl p-2 border border-gray-200/50 order-1 sm:order-2 sm:flex-1 sm:mx-4 sm:min-w-0"
                 >
                     <button
                         @click="goToPreviousWeek"
-                        class="bg-white/70 hover:bg-white/90 text-gray-600 font-bold px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200/50 backdrop-blur-sm"
+                        class="bg-white/70 hover:bg-white/90 text-gray-600 font-bold px-3 sm:px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200/50 backdrop-blur-sm"
                         title="Săptămâna precedentă"
                     >
                         <svg
@@ -853,7 +866,7 @@
                     </button>
                     <button
                         @click="goToPreviousDay"
-                        class="bg-white/70 hover:bg-white/90 text-gray-600 font-bold px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200/50 backdrop-blur-sm"
+                        class="bg-white/70 hover:bg-white/90 text-gray-600 font-bold px-3 sm:px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200/50 backdrop-blur-sm"
                         title="Ziua precedentă"
                     >
                         <svg
@@ -872,14 +885,14 @@
                     </button>
 
                     <div
-                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100/80 rounded-lg flex-1 text-center min-w-0 backdrop-blur-sm"
+                        class="px-2 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 bg-gray-100/80 rounded-lg flex-1 text-center min-w-0 backdrop-blur-sm"
                     >
                         {{ formatDateRange() }}
                     </div>
 
                     <button
                         @click="goToNextDay"
-                        class="bg-white/70 hover:bg-white/90 text-gray-600 font-bold px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200/50 backdrop-blur-sm"
+                        class="bg-white/70 hover:bg-white/90 text-gray-600 font-bold px-3 sm:px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200/50 backdrop-blur-sm"
                         title="Ziua următoare"
                     >
                         <svg
@@ -898,7 +911,7 @@
                     </button>
                     <button
                         @click="goToNextWeek"
-                        class="bg-white/70 hover:bg-white/90 text-gray-600 font-bold px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200/50 backdrop-blur-sm"
+                        class="bg-white/70 hover:bg-white/90 text-gray-600 font-bold px-3 sm:px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200/50 backdrop-blur-sm"
                         title="Săptămâna următoare"
                     >
                         <svg
@@ -921,7 +934,7 @@
                 <button
                     @click="goToCurrentWeek"
                     :class="[
-                        'font-semibold px-6 py-3 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center space-x-2 flex-shrink-0',
+                        'font-semibold px-6 py-3 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center justify-center space-x-2 order-2 sm:order-3',
                         isCurrentWeek
                             ? 'bg-emerald-700 hover:bg-emerald-800 text-white'
                             : 'bg-emerald-600 hover:bg-emerald-700 text-white',
@@ -940,7 +953,7 @@
                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                         ></path>
                     </svg>
-                    <span>{{
+                    <span class="text-sm sm:text-base">{{
                         isCurrentWeek ? "Săptămâna curentă" : "Săptămâna asta"
                     }}</span>
                     <span
@@ -1498,5 +1511,11 @@ const goToNotificationDate = (notification) => {
 
 const markNotificationRead = (notificationId) => {
     router.get(route("notification.read", notificationId));
+};
+
+const deleteExercise = (exerciseId) => {
+    if (confirm("Sigur vrei să ștergi acest exercițiu?")) {
+        router.delete(route("exercises.destroy", exerciseId));
+    }
 };
 </script>
