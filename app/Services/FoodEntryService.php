@@ -31,6 +31,7 @@ class FoodEntryService
             $entry->ate_at = Carbon::parse($entry->ate_at);
             $entry->ate_at_date = $entry->ate_at->format('Y-m-d');
             $entry->hasThumbs = $entry->thumbs || ($entry->food_item_id && $entry->thumbs);
+            $entry->thumbs_type = $entry->hasThumbs->thumbs_type ?? null;
 
             return $entry;
         });
