@@ -1611,11 +1611,7 @@ if (props.foodEntries && props.foodEntries.length > 0) {
 
 // Forms
 const entryForm = useForm({
-    time: new Date().toLocaleTimeString("en-GB", {
-        hour: "2-digit",
-        minute: "2-digit",
-        timeZone: "UTC",
-    }),
+    time: "",
     // Catalog mode fields
     food_item_id: "",
     multiplier: 1,
@@ -1835,11 +1831,7 @@ const directMultiplier = ref(1);
 // Helper method to reset the form
 const resetEntryForm = () => {
     entryForm.reset();
-    entryForm.time = new Date().toLocaleTimeString("en-GB", {
-        hour: "2-digit",
-        minute: "2-digit",
-        timeZone: "UTC",
-    });
+    entryForm.time = "";
     entryForm.multiplier = 1;
     // Set the date from the currently selected day
     if (selectedDay.value) {
