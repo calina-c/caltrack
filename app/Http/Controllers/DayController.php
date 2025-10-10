@@ -6,6 +6,7 @@ use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Inertia\Inertia;
 
 class DayController extends Controller
 {
@@ -62,9 +63,6 @@ class DayController extends Controller
         ]);
         $notification->save();
 
-        return redirect()->route('food-entries.index', ['date' => $day->date->addDay()->format('Y-m-d')])->with(
-            'success',
-            'Ai dat rating.'
-        )->withPreviousInput($request->all());
+        return Inertia::location(route('food-entries.index', ['date' => $day->date->addDay()->format('Y-m-d')]));
     }
 }
